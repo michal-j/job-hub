@@ -3,6 +3,14 @@
     {
       "path": "/api/ingest/adzuna",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/ingest/arbeitnow",
+      "schedule": "5 6 * * *"
+    },
+    {
+      "path": "/api/ingest/remotive",
+      "schedule": "10 6 * * *"
     }
   ]
 }

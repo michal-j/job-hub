@@ -1,17 +1,7 @@
 // Adzuna API client. Docs: https://developer.adzuna.com/docs/search
 // Free tier: sign up at developer.adzuna.com for an app_id + app_key.
 
-export interface NormalizedJob {
-  title: string;
-  companyName: string;
-  locationRaw: string;
-  remoteFlagRaw: string | null;
-  description: string;
-  originalPostedAt: string | null;
-  sourceUrl: string;
-  sourceJobId: string | null;
-  rawPayload: unknown;
-}
+import type { NormalizedJob } from "./types";
 
 interface AdzunaResult {
   id: string;

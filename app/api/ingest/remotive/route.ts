@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { runIngestionForSource } from "@/lib/ingestion";
-import { fetchAdzunaJobs } from "@/lib/sources/adzuna";
+import { fetchRemotiveJobs } from "@/lib/sources/remotive";
 
 async function handle() {
   try {
-    const result = await runIngestionForSource("adzuna", fetchAdzunaJobs);
+    const result = await runIngestionForSource("remotive", fetchRemotiveJobs);
     return NextResponse.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -12,12 +12,10 @@ async function handle() {
   }
 }
 
-// GET: called by Vercel Cron on the daily schedule (see vercel.json).
 export async function GET() {
   return handle();
 }
 
-// POST: for manual testing via curl.
 export async function POST() {
   return handle();
 }

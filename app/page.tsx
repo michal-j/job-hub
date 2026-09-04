@@ -1,6 +1,9 @@
 import { getJobList } from "@/lib/jobs";
 import { JobList } from "./components/JobList";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export default async function HomePage() {
   let jobs: Awaited<ReturnType<typeof getJobList>> = [];
   let errorMessage = "";
@@ -19,9 +22,22 @@ export default async function HomePage() {
         padding: "0 24px",
       }}
     >
-      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
-        Job Hub
-      </h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 24,
+        }}
+      >
+        <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0 }}>Job Hub</h1>
+        <a
+          href="/cv"
+          style={{ fontSize: 14, color: "#374151", textDecoration: "none" }}
+        >
+          Your CV →
+        </a>
+      </div>
 
       {errorMessage && (
         <div

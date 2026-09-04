@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { STATUS_STYLES } from "./statusStyles";
 
 const STATUS_OPTIONS = [
   { value: "new", label: "New" },
@@ -49,6 +50,8 @@ export function StatusSelect({
     }
   }
 
+  const style = STATUS_STYLES[status] ?? STATUS_STYLES.new;
+
   return (
     <select
       value={status}
@@ -59,7 +62,7 @@ export function StatusSelect({
         fontSize: 13,
         padding: "4px 8px",
         borderRadius: 6,
-        border: "1px solid #d1d5db",
+        border: `1px solid ${style.border}`,
         background: saving ? "#f3f4f6" : "white",
         color: "#111827",
       }}

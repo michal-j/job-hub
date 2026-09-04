@@ -1,5 +1,8 @@
 import { getSupabaseServerClient } from "@/lib/supabase";
 import { computeDedupHash } from "@/lib/dedup";
+import { analyzeCompatibility } from "@/lib/compatibility";
+import { analyzeLocationFit } from "@/lib/locationFit";
+import type { CvFacts } from "@/lib/cv";
 import type { NormalizedJob } from "@/lib/sources/types";
 
 export async function runIngestionForSource(
@@ -29,6 +32,15 @@ export async function runIngestionForSource(
   let jobsFound = 0;
   let jobsNew = 0;
 
+  // Fetch once, reused for every new job this run — avoids a query per job.
+  const { data: cv } = await supabase
+    .from("cv_profile")
+    .select("structured_facts")
+    .order("uploaded_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const cvFacts = (cv?.structured_facts as CvFacts | null) ?? null;
+
   try {
     const jobs = await fetchJobs();
     jobsFound = jobs.length;
@@ -51,10 +63,19 @@ export async function runIngestionForSource(
 
       if (existingCompany) {
         companyId = existingCompany.id;
+        // Backfill a logo if we now have one and didn't before (e.g. this
+        // company was first seen via a source that doesn't provide logos).
+        if (job.companyLogoUrl) {
+          await supabase
+            .from("company")
+            .update({ logo_url: job.companyLogoUrl })
+            .eq("id", companyId)
+            .is("logo_url", null);
+        }
       } else {
         const { data: newCompany, error: companyError } = await supabase
           .from("company")
-          .insert({ name: job.companyName })
+          .insert({ name: job.companyName, logo_url: job.companyLogoUrl ?? null })
           .select("id")
           .single();
         if (companyError || !newCompany) throw companyError;
@@ -100,6 +121,63 @@ export async function runIngestionForSource(
         job_id: newJob.id,
         status: "new",
       });
+
+      // Auto-analyze if a CV is on file. Best-effort: a failure here
+      // (rate limit, transient API error) shouldn't break ingestion for
+      // the rest of the batch — the job just stays unscored and can be
+      // analyzed manually later.
+      if (cvFacts) {
+        try {
+          const result = await analyzeCompatibility(
+            cvFacts,
+            job.title,
+            job.description ?? ""
+          );
+          await supabase.from("compatibility_analysis").upsert(
+            {
+              job_id: newJob.id,
+              overall_score: result.overall_score,
+              category_scores: result.category_scores,
+              overview: result.overview,
+              highlights: result.highlights,
+              created_at: new Date().toISOString(),
+            },
+            { onConflict: "job_id" }
+          );
+        } catch (analysisErr) {
+          console.error(
+            `Auto-analysis failed for job ${newJob.id}:`,
+            analysisErr
+          );
+        }
+      }
+
+      // Location fit doesn't need a CV — runs unconditionally for every
+      // new job. Same best-effort pattern: a failure here shouldn't break
+      // ingestion for the rest of the batch.
+      try {
+        const locationResult = await analyzeLocationFit(
+          job.title,
+          job.locationRaw ?? "",
+          job.remoteFlagRaw,
+          job.description ?? ""
+        );
+        await supabase.from("location_analysis").upsert(
+          {
+            job_id: newJob.id,
+            verdict: locationResult.verdict,
+            explanation: locationResult.explanation,
+            highlights: locationResult.highlights,
+            created_at: new Date().toISOString(),
+          },
+          { onConflict: "job_id" }
+        );
+      } catch (locationErr) {
+        console.error(
+          `Auto location-fit analysis failed for job ${newJob.id}:`,
+          locationErr
+        );
+      }
 
       jobsNew++;
     }

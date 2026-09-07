@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { JobListItem } from "@/lib/jobs";
+import { usePopupDirection } from "./usePopupDirection";
 
 const VERDICT_STYLES: Record<
   string,
@@ -24,6 +25,7 @@ export function LocationBadge({
   const [hovering, setHovering] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState("");
+  const { triggerRef, direction, measureAndOpen } = usePopupDirection();
 
   async function runAnalysis(e: React.MouseEvent) {
     e.stopPropagation();
@@ -84,8 +86,12 @@ export function LocationBadge({
 
   return (
     <div
+      ref={triggerRef}
       style={{ position: "relative", display: "inline-block" }}
-      onMouseEnter={() => setHovering(true)}
+      onMouseEnter={() => {
+        measureAndOpen();
+        setHovering(true);
+      }}
       onMouseLeave={() => setHovering(false)}
     >
       <div
@@ -107,14 +113,25 @@ export function LocationBadge({
       {hovering && (
         <div
           onClick={(e) => e.stopPropagation()}
-          style={{
-            position: "absolute",
-            top: "100%",
-            paddingTop: 6,
-            right: 0,
-            zIndex: 20,
-            width: 300,
-          }}
+          style={
+            direction === "up"
+              ? {
+                  position: "absolute",
+                  bottom: "100%",
+                  paddingBottom: 6,
+                  right: 0,
+                  zIndex: 20,
+                  width: 300,
+                }
+              : {
+                  position: "absolute",
+                  top: "100%",
+                  paddingTop: 6,
+                  right: 0,
+                  zIndex: 20,
+                  width: 300,
+                }
+          }
         >
           <div
             style={{

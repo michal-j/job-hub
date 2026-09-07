@@ -22,6 +22,8 @@ ${CANDIDATE_CONTEXT}
 
 Distinguish between: where the company is based, where the job can be performed, where the employer is willing/able to employ someone, and expected working hours — these are not the same thing. Base your assessment only on what's actually stated; do not assume "Remote" means "remote from anywhere."
 
+HARD RULE: if the listing describes a hybrid work model (regularly required in-office, even part-time) AND the office/location is anywhere other than Poznań, Poland — this is automatically "no_fit", regardless of any other remote-eligibility language elsewhere in the listing. Hybrid inherently requires physical presence, so remote eligibility elsewhere doesn't rescue it. Only skip this rule if the hybrid location genuinely is Poznań.
+
 Return ONLY a JSON object (no markdown fences, no commentary) with this exact shape:
 
 {

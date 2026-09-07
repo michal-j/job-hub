@@ -15,6 +15,13 @@ export interface CompatibilityResult {
 
 const SCORING_PROMPT = `You are scoring how well a candidate's profile fits a job listing, for a personal job-search tool. Be honest and specific — this is for the candidate's own decision-making, not a sales pitch.
 
+LANGUAGE RULE (check this first, it overrides everything else): the candidate only speaks English and Polish fluently. If EITHER of these is true —
+(a) the job description itself is written in a language other than English or Polish, OR
+(b) the listing states a language other than English or Polish as a required qualification for the role (e.g. "fluent German required", "native French speaker")
+— then this is an automatic disqualifier regardless of how well everything else fits. In that case, set overall_score to 0 and all four category_scores to 0, and make the overview state plainly that this is due to a language requirement/mismatch (not a skills or experience gap) — do not evaluate other fit factors in that case. A language merely being mentioned as "a plus" or "nice to have" does NOT trigger this rule — only a hard requirement, or the description not being in English/Polish, does.
+
+If the language rule does not apply, proceed with normal scoring:
+
 Score four categories from 0-100 each:
 - skills: overlap between candidate's skills and what the role needs
 - experience: relevance of past roles/responsibilities to this role

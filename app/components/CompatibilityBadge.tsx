@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { JobListItem } from "@/lib/jobs";
+import { usePopupDirection } from "./usePopupDirection";
 
 function scoreColor(score: number): { bg: string; fg: string } {
   if (score >= 75) return { bg: "#d1fae5", fg: "#065f46" };
@@ -28,6 +29,7 @@ export function CompatibilityBadge({
   const [hovering, setHovering] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState("");
+  const { triggerRef, direction, measureAndOpen } = usePopupDirection();
 
   async function runAnalysis(e: React.MouseEvent) {
     e.stopPropagation();
@@ -89,8 +91,12 @@ export function CompatibilityBadge({
 
   return (
     <div
+      ref={triggerRef}
       style={{ position: "relative", display: "inline-block" }}
-      onMouseEnter={() => setHovering(true)}
+      onMouseEnter={() => {
+        measureAndOpen();
+        setHovering(true);
+      }}
       onMouseLeave={() => setHovering(false)}
     >
       <div
@@ -112,14 +118,25 @@ export function CompatibilityBadge({
       {hovering && (
         <div
           onClick={(e) => e.stopPropagation()}
-          style={{
-            position: "absolute",
-            top: "100%",
-            paddingTop: 6,
-            right: 0,
-            zIndex: 20,
-            width: 320,
-          }}
+          style={
+            direction === "up"
+              ? {
+                  position: "absolute",
+                  bottom: "100%",
+                  paddingBottom: 6,
+                  right: 0,
+                  zIndex: 20,
+                  width: 320,
+                }
+              : {
+                  position: "absolute",
+                  top: "100%",
+                  paddingTop: 6,
+                  right: 0,
+                  zIndex: 20,
+                  width: 320,
+                }
+          }
         >
           <div
             style={{

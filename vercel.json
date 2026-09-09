@@ -11,6 +11,10 @@
     {
       "path": "/api/ingest/remotive",
       "schedule": "10 6 * * *"
+    },
+    {
+      "path": "/api/ingest/jooble",
+      "schedule": "15 6 * * *"
     }
   ],
   "functions": {

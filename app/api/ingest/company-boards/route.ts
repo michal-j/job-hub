@@ -4,6 +4,7 @@ import { COMPANY_BOARDS } from "@/lib/companyBoards";
 import { fetchGreenhouseJobs } from "@/lib/sources/greenhouse";
 import { fetchAshbyJobs } from "@/lib/sources/ashby";
 import { fetchSmartRecruitersJobs } from "@/lib/sources/smartrecruiters";
+import { fetchPersonioJobs } from "@/lib/sources/personio";
 
 async function handle() {
   const results: Record<string, unknown> = {};
@@ -18,6 +19,9 @@ async function handle() {
         }
         if (company.platform === "ashby") {
           return fetchAshbyJobs(company.sourceName, company.slug);
+        }
+        if (company.platform === "personio") {
+          return fetchPersonioJobs(company.sourceName, company.slug);
         }
         return fetchSmartRecruitersJobs(company.sourceName, company.slug);
       };

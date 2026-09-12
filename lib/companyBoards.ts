@@ -4,13 +4,14 @@
 //   Greenhouse:      boards.greenhouse.io/{slug}          → platform: "greenhouse"
 //   Ashby:           jobs.ashbyhq.com/{slug}               → platform: "ashby"
 //   SmartRecruiters: careers.smartrecruiters.com/{slug}    → platform: "smartrecruiters"
+//   Personio:        {slug}.jobs.personio.de                → platform: "personio"
 //
 // sourceName is what shows up in the app's source filter pills — keep it
 // short and recognizable.
 
 export interface CompanyBoardConfig {
   sourceName: string;
-  platform: "greenhouse" | "ashby" | "smartrecruiters";
+  platform: "greenhouse" | "ashby" | "smartrecruiters" | "personio";
   slug: string;
 }
 
@@ -26,4 +27,6 @@ export const COMPANY_BOARDS: CompanyBoardConfig[] = [
     platform: "smartrecruiters",
     slug: "SmartRecruiters",
   },
+  { sourceName: "personio", platform: "personio", slug: "personio" },
+  // Factorial removed
 ];

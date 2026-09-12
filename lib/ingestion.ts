@@ -11,21 +11,32 @@ export async function runIngestionForSource(
 ) {
   const supabase = getSupabaseServerClient();
 
-  const { data: source, error: sourceError } = await supabase
+  let sourceId: string;
+  const { data: existingSource } = await supabase
     .from("job_source")
     .select("id")
     .eq("name", sourceName)
-    .single();
+    .maybeSingle();
 
-  if (sourceError || !source) {
-    throw new Error(
-      `"${sourceName}" source row not found — did you run schema.sql?`
-    );
+  if (existingSource) {
+    sourceId = existingSource.id;
+  } else {
+    const { data: newSource, error: createError } = await supabase
+      .from("job_source")
+      .insert({ name: sourceName })
+      .select("id")
+      .single();
+    if (createError || !newSource) {
+      throw new Error(
+        `Could not create source row for "${sourceName}": ${createError?.message}`
+      );
+    }
+    sourceId = newSource.id;
   }
 
   const { data: runRow } = await supabase
     .from("update_run")
-    .insert({ source_id: source.id })
+    .insert({ source_id: sourceId })
     .select("id")
     .single();
 
@@ -111,7 +122,7 @@ export async function runIngestionForSource(
 
       await supabase.from("job_listing").insert({
         job_id: newJob.id,
-        source_id: source.id,
+        source_id: sourceId,
         source_url: job.sourceUrl,
         source_job_id: job.sourceJobId,
         raw_payload: job.rawPayload,

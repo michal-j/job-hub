@@ -4,6 +4,7 @@
 // title client-side.
 
 import type { NormalizedJob } from "./types";
+import { PM_TITLE_MATCH } from "./shared";
 
 interface ArbeitnowJob {
   slug: string;
@@ -23,8 +24,6 @@ interface ArbeitnowResponse {
   links: { next: string | null };
 }
 
-const TITLE_MATCH = /product\s*(manager|owner)/i;
-
 export async function fetchArbeitnowJobs(): Promise<NormalizedJob[]> {
   const allJobs: NormalizedJob[] = [];
   let url: string | null = "https://www.arbeitnow.com/api/job-board-api";
@@ -41,7 +40,7 @@ export async function fetchArbeitnowJobs(): Promise<NormalizedJob[]> {
     pagesFetched++;
 
     for (const job of data.data) {
-      if (!TITLE_MATCH.test(job.title)) continue;
+      if (!PM_TITLE_MATCH.test(job.title)) continue;
 
       allJobs.push({
         title: job.title,

@@ -15,6 +15,10 @@
     {
       "path": "/api/ingest/jooble",
       "schedule": "15 6 * * *"
+    },
+    {
+      "path": "/api/ingest/company-boards",
+      "schedule": "20 6 * * *"
     }
   ],
   "functions": {

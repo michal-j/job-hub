@@ -7,9 +7,13 @@ Scheduled automation and the list UI come in later milestones.
 
 1. **Create a Supabase project** at supabase.com (free tier).
    - In the SQL Editor, paste and run `supabase/schema.sql`.
-   - In Project Settings > API, copy the **Project URL** and the
-     **service_role** key (not the anon key — this app runs entirely
-     server-side).
+   - In Project Settings > API, copy the **Project URL**, the
+     **service_role** key, and the **anon/publishable** key.
+   - In Authentication > Providers > Email, turn **off** "Allow new users
+     to sign up" — this is a single-owner app, not a multi-user one.
+   - In Authentication > Users, click "Add user" and create your one
+     account (your email + a password of your choosing). That's your
+     Job Hub login.
 
 2. **Install dependencies**
    ```
@@ -20,8 +24,8 @@ Scheduled automation and the list UI come in later milestones.
    ```
    cp .env.local.example .env.local
    ```
-   Fill in `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and pick any
-   `APP_PASSWORD`.
+   Fill in `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
+   `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 
    Also sign up free at https://developer.adzuna.com/ (instant, no
    approval wait) and fill in `ADZUNA_APP_ID` / `ADZUNA_APP_KEY`.
@@ -30,32 +34,42 @@ Scheduled automation and the list UI come in later milestones.
    ```
    npm run dev
    ```
-   Open http://localhost:3000 — your browser will prompt for a username
-   (anything) and password (`APP_PASSWORD`). You should see "Connected to
+   Open http://localhost:3000 — you'll be redirected to `/login`. Sign in
+   with the account you created above. You should see "Connected to
    Supabase. No jobs yet."
+
+   `/demo` is a public route with no login required — a frozen sample
+   dataset with edits kept in `localStorage` only, no Supabase or
+   Anthropic calls. Useful for showing the app off without exposing your
+   real data.
 
 ## Deploying to Vercel (free tier)
 
 1. Push this repo to GitHub.
 2. Import it in Vercel.
 3. In Vercel's Project Settings > Environment Variables, add the same
-   three variables from `.env.local` (never commit `.env.local` itself —
-   it's gitignored).
-4. Deploy. The Basic Auth prompt will gate the live URL the same way it
-   does locally.
+   variables from `.env.local` (never commit `.env.local` itself — it's
+   gitignored).
+4. Deploy. `/login` will gate the live URL the same way it does locally;
+   `/demo` stays public.
 
 ## Trying ingestion
 
-With the dev server running, trigger it manually:
+Ingestion routes are gated by middleware like everything else, so a plain
+`curl` can't trigger them — sign in in the browser first, then run the
+fetch from the browser console (it'll carry your session cookie):
 
-```
-curl -u :<APP_PASSWORD> -X POST http://localhost:3000/api/ingest/adzuna
+```js
+fetch("/api/ingest/adzuna", { method: "POST" }).then((r) => r.json()).then(console.log)
 ```
 
 Response looks like `{"jobsFound": 34, "jobsNew": 34}`. Run it twice in a
 row — the second run should report `jobsNew: 0` since everything's already
 deduped. Check the Supabase table editor to see real rows in `job`,
 `job_listing`, and `company`.
+
+Vercel Cron uses a separate `Bearer` token (`CRON_SECRET`), unaffected by
+any of this — see `middleware.ts`.
 
 ## What's next (milestone 3)
 

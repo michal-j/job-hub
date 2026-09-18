@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StatusSelect } from "./StatusSelect";
 import { CompatibilityBadge } from "./CompatibilityBadge";
 import { LocationBadge } from "./LocationBadge";
 import { STATUS_STYLES } from "./statusStyles";
+import { loadDemoJobs, saveDemoJobs } from "@/lib/demoJobs";
 import type { JobListItem } from "@/lib/jobs";
 
 const FILTER_OPTIONS = [
@@ -72,10 +73,24 @@ function CompanyLogo({ name, logoUrl }: { name: string; logoUrl: string | null }
   );
 }
 
-export function JobList({ initialJobs }: { initialJobs: JobListItem[] }) {
+export function JobList({
+  initialJobs,
+  demoMode = false,
+}: {
+  initialJobs: JobListItem[];
+  demoMode?: boolean;
+}) {
   const [jobs, setJobs] = useState(initialJobs);
   const [filter, setFilter] = useState("new");
   const [sourceFilter, setSourceFilter] = useState("all");
+
+  // The demo has no backend — on mount, prefer whatever the visitor left
+  // in localStorage from a previous visit over the frozen snapshot.
+  useEffect(() => {
+    if (!demoMode) return;
+    setJobs(loadDemoJobs(initialJobs));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Derived from the actual data rather than hardcoded — so this stays
   // correct as more sources get added later without touching this file.
@@ -93,9 +108,13 @@ export function JobList({ initialJobs }: { initialJobs: JobListItem[] }) {
   }, [jobs, filter, sourceFilter]);
 
   function handleStatusChange(jobId: string, newStatus: string) {
-    setJobs((prev) =>
-      prev.map((j) => (j.id === jobId ? { ...j, status: newStatus } : j))
-    );
+    setJobs((prev) => {
+      const next = prev.map((j) =>
+        j.id === jobId ? { ...j, status: newStatus } : j
+      );
+      if (demoMode) saveDemoJobs(next);
+      return next;
+    });
   }
 
   function handleAnalyzed(
@@ -200,22 +219,37 @@ export function JobList({ initialJobs }: { initialJobs: JobListItem[] }) {
 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                  <a
-                    href={job.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 600,
-                      color: "#111827",
-                      textDecoration: "none",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {job.title}
-                  </a>
+                  {job.sourceUrl && job.sourceUrl !== "#" ? (
+                    <a
+                      href={job.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 600,
+                        color: "#111827",
+                        textDecoration: "none",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {job.title}
+                    </a>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 600,
+                        color: "#111827",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {job.title}
+                    </span>
+                  )}
                   {job.isNew && (
                     <span
                       style={{
@@ -255,16 +289,19 @@ export function JobList({ initialJobs }: { initialJobs: JobListItem[] }) {
                   jobId={job.id}
                   status={job.status}
                   onChange={handleStatusChange}
+                  demoMode={demoMode}
                 />
                 <CompatibilityBadge
                   jobId={job.id}
                   compatibility={job.compatibility}
                   onAnalyzed={handleAnalyzed}
+                  demoMode={demoMode}
                 />
                 <LocationBadge
                   jobId={job.id}
                   locationFit={job.locationFit}
                   onAnalyzed={handleLocationAnalyzed}
+                  demoMode={demoMode}
                 />
               </div>
             </div>

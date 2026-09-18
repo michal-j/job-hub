@@ -1,16 +1,23 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
 
-// Simple shared-secret gate: since this app is single-user with no auth
-// system, this is enough to keep it from being casually indexed/browsed
-// by anyone who finds the URL. The password lives only in Vercel's
-// environment variables, never in code.
-export function middleware(request: NextRequest) {
-  const authHeader = request.headers.get("authorization");
+// Routes that need no session at all: the sign-in page itself, and the
+// public demo (static snapshot + localStorage, no Supabase/Anthropic
+// calls — see app/demo/page.tsx).
+const PUBLIC_PATHS = ["/login", "/demo"];
 
-  // Vercel Cron calls /api/ingest/* on a schedule and can't provide the
-  // Basic Auth password (there's no browser involved). It sends a Bearer
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+}
+
+export async function middleware(request: NextRequest) {
+  // Vercel Cron calls /api/ingest/* on a schedule and can't provide a
+  // Supabase session (there's no browser involved). It sends a Bearer
   // token instead, set via the CRON_SECRET env var — only that route
   // accepts this alternate auth, and only with the exact matching secret.
+  const authHeader = request.headers.get("authorization");
   if (
     request.nextUrl.pathname.startsWith("/api/ingest/") &&
     authHeader === `Bearer ${process.env.CRON_SECRET}` &&
@@ -19,21 +26,45 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (authHeader?.startsWith("Basic ")) {
-    const decoded = atob(authHeader.split(" ")[1]);
-    const [, password] = decoded.split(":");
-
-    if (password && password === process.env.APP_PASSWORD) {
-      return NextResponse.next();
-    }
+  if (isPublicPath(request.nextUrl.pathname)) {
+    return NextResponse.next();
   }
 
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="job-hub"' },
-  });
+  const response = NextResponse.next({ request });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value;
+        },
+        set(name, value, options) {
+          response.cookies.set(name, value, options);
+        },
+        remove(name, options) {
+          response.cookies.set(name, "", options);
+        },
+      },
+    }
+  );
+
+  const { data } = await supabase.auth.getUser();
+
+  if (!data.user) {
+    if (request.nextUrl.pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg).*)"],
 };

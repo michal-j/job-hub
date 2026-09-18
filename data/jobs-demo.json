@@ -1,0 +1,794 @@
+[
+  {
+    "id": "demo-real-1",
+    "title": "Team Lead Product Manager, Mobile Apps (m/f/d)",
+    "companyName": "AutoScout24",
+    "companyLogoUrl": null,
+    "locationRaw": null,
+    "originalPostedAt": "2026-09-18T05:55:25+00:00",
+    "discoveredAt": "2026-09-18T06:31:11+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.com/jobs/companies/autoscout24/team-lead-product-manager-mobile-apps-138513",
+    "sourceName": "arbeitnow",
+    "isNew": true,
+    "compatibility": {
+      "overallScore": 72,
+      "categoryScores": { "skills": 75, "experience": 70, "domain_industry": 65, "seniority": 78 },
+      "overview": "Solid overlap on mobile product leadership and team management; automotive marketplace domain is adjacent rather than direct experience.",
+      "highlights": ["Team lead experience transfers well", "Mobile app product background", "Automotive marketplace is a new domain"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "Listing doesn't specify an office location or remote policy.",
+      "highlights": ["No location details provided"]
+    }
+  },
+  {
+    "id": "demo-real-2",
+    "title": "Product Manager Apprentice, Checkout",
+    "companyName": "Back Market",
+    "companyLogoUrl": null,
+    "locationRaw": "Paris",
+    "originalPostedAt": "2026-09-18T04:40:11+00:00",
+    "discoveredAt": "2026-09-18T06:31:42+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.fr/jobs/companies/backmarket/product-manager-apprentice-checkout-paris-84960",
+    "sourceName": "arbeitnow",
+    "isNew": true,
+    "compatibility": {
+      "overallScore": 38,
+      "categoryScores": { "skills": 55, "experience": 20, "domain_industry": 60, "seniority": 15 },
+      "overview": "An apprenticeship-level checkout PM role — seniority and compensation band likely well below your experience level.",
+      "highlights": ["Junior/apprentice level, not senior", "Checkout & payments domain is relevant", "Requires Paris relocation"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "On-site in Paris with no remote option mentioned.",
+      "highlights": ["Paris on-site required"]
+    }
+  },
+  {
+    "id": "demo-real-3",
+    "title": "Senior Agent Product Manager",
+    "companyName": "Decagon",
+    "companyLogoUrl": null,
+    "locationRaw": "London",
+    "originalPostedAt": "2026-09-18T03:40:10+00:00",
+    "discoveredAt": "2026-09-18T06:31:18+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.co.uk/jobs/companies/decagon/senior-agent-product-manager-london-341822",
+    "sourceName": "arbeitnow",
+    "isNew": true,
+    "compatibility": {
+      "overallScore": 81,
+      "categoryScores": { "skills": 85, "experience": 78, "domain_industry": 80, "seniority": 82 },
+      "overview": "Strong fit — senior product role building AI agent capabilities, closely matching recent experience with applied AI features.",
+      "highlights": ["Direct AI/agent product experience", "Senior scope matches your level", "Fast-growing, well-funded startup"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "Location says London but the remote/hybrid policy isn't specified in the listing.",
+      "highlights": ["Remote policy unclear"]
+    }
+  },
+  {
+    "id": "demo-real-4",
+    "title": "Lead Technical Product Manager",
+    "companyName": "Numan",
+    "companyLogoUrl": null,
+    "locationRaw": "London",
+    "originalPostedAt": "2026-09-18T03:24:04+00:00",
+    "discoveredAt": "2026-09-18T06:31:34+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.co.uk/jobs/companies/numan/lead-technical-product-manager-london-41709",
+    "sourceName": "arbeitnow",
+    "isNew": true,
+    "compatibility": {
+      "overallScore": 68,
+      "categoryScores": { "skills": 70, "experience": 65, "domain_industry": 55, "seniority": 72 },
+      "overview": "Technical PM background aligns well; healthtech/telehealth is a less familiar domain than your recent industries.",
+      "highlights": ["Strong technical PM overlap", "New domain: consumer healthtech", "Lead-level seniority matches"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "London-based; remote/hybrid policy not stated in the listing.",
+      "highlights": ["Policy unclear"]
+    }
+  },
+  {
+    "id": "demo-real-5",
+    "title": "(Senior) Product Manager",
+    "companyName": "Consultport",
+    "companyLogoUrl": null,
+    "locationRaw": "Berlin",
+    "originalPostedAt": "2026-09-17T15:00:27+00:00",
+    "discoveredAt": "2026-09-18T06:31:50+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.com/jobs/companies/consultport/senior-product-manager-berlin-373822",
+    "sourceName": "arbeitnow",
+    "isNew": true,
+    "compatibility": {
+      "overallScore": 63,
+      "categoryScores": { "skills": 66, "experience": 60, "domain_industry": 58, "seniority": 68 },
+      "overview": "Reasonable senior PM match; marketplace/consulting-services domain only partially overlaps prior experience.",
+      "highlights": ["Senior scope fits", "Marketplace product experience relevant", "Smaller company, less brand recognition"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "Berlin-based; remote/hybrid policy not stated in the listing.",
+      "highlights": ["Policy unclear"]
+    }
+  },
+  {
+    "id": "demo-real-6",
+    "title": "Product Manager - Investing (f/m/x)",
+    "companyName": "Lemon Markets",
+    "companyLogoUrl": null,
+    "locationRaw": "Germany (Hybrid)",
+    "originalPostedAt": "2026-09-17T14:40:13+00:00",
+    "discoveredAt": "2026-09-18T06:31:57+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.com/jobs/companies/lemon-markets/product-manager-investing-berlin-463062",
+    "sourceName": "arbeitnow",
+    "isNew": true,
+    "compatibility": {
+      "overallScore": 77,
+      "categoryScores": { "skills": 80, "experience": 75, "domain_industry": 72, "seniority": 74 },
+      "overview": "Good fit — fintech investing-API product work maps closely to prior B2B fintech experience, hybrid Germany role.",
+      "highlights": ["Fintech/investing domain match", "Hybrid — some flexibility", "B2B API product experience relevant"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Hybrid role based in Germany, compatible with your location.",
+      "highlights": ["Hybrid flexibility", "Germany-based"]
+    }
+  },
+  {
+    "id": "demo-real-7",
+    "title": "GTM Product Manager",
+    "companyName": "Remote.com",
+    "companyLogoUrl": null,
+    "locationRaw": "EMEA",
+    "originalPostedAt": "2026-09-16T23:50:35+00:00",
+    "discoveredAt": "2026-09-17T07:16:12+00:00",
+    "status": "new",
+    "sourceUrl": "https://job-boards.greenhouse.io/remotecom/jobs/7799283003",
+    "sourceName": "remote.com",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 74,
+      "categoryScores": { "skills": 76, "experience": 72, "domain_industry": 68, "seniority": 75 },
+      "overview": "Go-to-market PM role at a remote-first HR-tech company; strong seniority and remote-culture fit, GTM specialization is a modest stretch from core product work.",
+      "highlights": ["Fully remote, EMEA-wide", "GTM-focused PM, adjacent skillset", "HR-tech domain is new"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote across EMEA — matches your location needs.",
+      "highlights": ["Remote-first company", "EMEA timezone overlap"]
+    }
+  },
+  {
+    "id": "demo-real-8",
+    "title": "Lead Product Manager (UK)",
+    "companyName": "Writer",
+    "companyLogoUrl": null,
+    "locationRaw": "London, UK",
+    "originalPostedAt": "2026-09-16T21:40:11+00:00",
+    "discoveredAt": "2026-09-17T06:31:56+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.co.uk/jobs/companies/writer/lead-product-manager-uk-london-347696",
+    "sourceName": "arbeitnow",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 85,
+      "categoryScores": { "skills": 88, "experience": 82, "domain_industry": 85, "seniority": 84 },
+      "overview": "Excellent fit — enterprise generative AI product leadership closely mirrors your recent focus areas and seniority.",
+      "highlights": ["Direct enterprise AI product experience", "Lead-level seniority match", "High-growth, well-regarded team"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "London-based; remote/hybrid policy not stated in the listing.",
+      "highlights": ["Policy unclear"]
+    }
+  },
+  {
+    "id": "demo-real-9",
+    "title": "Product Owner",
+    "companyName": "Allica Bank",
+    "companyLogoUrl": null,
+    "locationRaw": "London Office",
+    "originalPostedAt": "2026-09-16T21:40:08+00:00",
+    "discoveredAt": "2026-09-17T06:32:02+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.co.uk/jobs/companies/allica-bank/product-owner-london-426261",
+    "sourceName": "arbeitnow",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 58,
+      "categoryScores": { "skills": 60, "experience": 55, "domain_industry": 50, "seniority": 62 },
+      "overview": "Moderate fit — product owner scope is a step down in seniority from lead/senior PM roles, and UK SME banking is a new domain.",
+      "highlights": ["Owner-level, below your typical seniority", "Banking/fintech domain adjacent", "Office-based in London"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "\"London Office\" implies full in-office attendance.",
+      "highlights": ["No remote/hybrid mentioned"]
+    }
+  },
+  {
+    "id": "demo-real-10",
+    "title": "Senior Product Manager, SAP",
+    "companyName": "FloQast",
+    "companyLogoUrl": null,
+    "locationRaw": "London, England",
+    "originalPostedAt": "2026-09-16T03:24:32+00:00",
+    "discoveredAt": "2026-09-16T06:31:18+00:00",
+    "status": "new",
+    "sourceUrl": "https://www.arbeitnow.co.uk/jobs/companies/floqast/senior-product-manager-sap-london-england-351943",
+    "sourceName": "arbeitnow",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 55,
+      "categoryScores": { "skills": 58, "experience": 60, "domain_industry": 45, "seniority": 65 },
+      "overview": "Senior scope fits well, but deep SAP-integration specialization and accounting/close-software domain are a stretch from recent experience.",
+      "highlights": ["Senior level matches", "SAP integration is a niche specialization", "Accounting-software domain is new"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "London-based; remote/hybrid policy not stated in the listing.",
+      "highlights": ["Policy unclear"]
+    }
+  },
+  {
+    "id": "demo-interested-1",
+    "title": "Senior Product Manager, Data Platform",
+    "companyName": "Northwind Analytics",
+    "companyLogoUrl": null,
+    "locationRaw": "Amsterdam (Hybrid)",
+    "originalPostedAt": "2026-09-08T09:10:00+00:00",
+    "discoveredAt": "2026-09-08T10:05:00+00:00",
+    "status": "interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 78,
+      "categoryScores": { "skills": 80, "experience": 75, "domain_industry": 76, "seniority": 80 },
+      "overview": "Strong fit — senior data-platform PM scope closely matches recent experience, hybrid Amsterdam role.",
+      "highlights": ["Data platform domain matches well", "Hybrid schedule fits your preference", "Seniority level matches exactly"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Hybrid role based in Amsterdam, compatible with your location.",
+      "highlights": ["Hybrid, not full relocation", "Amsterdam within commuting range"]
+    }
+  },
+  {
+    "id": "demo-interested-2",
+    "title": "Group Product Manager",
+    "companyName": "Fjord Systems",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote (EU)",
+    "originalPostedAt": "2026-09-10T09:00:00+00:00",
+    "discoveredAt": "2026-09-10T10:00:00+00:00",
+    "status": "interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 74,
+      "categoryScores": { "skills": 76, "experience": 72, "domain_industry": 70, "seniority": 78 },
+      "overview": "Good fit — group-level scope and remote-EU setup align well, domain (climate-tech SaaS) is a modest departure.",
+      "highlights": ["Remote across EU", "Group-level seniority matches", "New domain: climate-tech"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote within the EU.",
+      "highlights": ["No relocation needed"]
+    }
+  },
+  {
+    "id": "demo-interested-3",
+    "title": "Lead Product Manager, Patient Experience",
+    "companyName": "Solstice Health",
+    "companyLogoUrl": null,
+    "locationRaw": "Berlin",
+    "originalPostedAt": "2026-09-04T09:00:00+00:00",
+    "discoveredAt": "2026-09-04T10:00:00+00:00",
+    "status": "interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 69,
+      "categoryScores": { "skills": 70, "experience": 68, "domain_industry": 60, "seniority": 72 },
+      "overview": "Reasonable fit — lead-level PM scope matches, healthtech/patient-experience domain only partially overlaps prior work.",
+      "highlights": ["Lead seniority matches", "Healthtech is a newer domain", "Berlin-based, on-site expectation unclear"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "Berlin office listed; remote/hybrid policy not specified.",
+      "highlights": ["Policy unclear from listing"]
+    }
+  },
+  {
+    "id": "demo-interested-4",
+    "title": "Senior Product Manager, Platform",
+    "companyName": "Meridian Cloud",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote",
+    "originalPostedAt": "2026-09-12T09:00:00+00:00",
+    "discoveredAt": "2026-09-12T10:00:00+00:00",
+    "status": "interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 82,
+      "categoryScores": { "skills": 85, "experience": 80, "domain_industry": 82, "seniority": 83 },
+      "overview": "Excellent fit — senior platform PM role closely mirrors recent infrastructure-product experience, fully remote.",
+      "highlights": ["Direct platform/infra experience", "Fully remote", "Seniority and scope both match well"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote, no location constraint.",
+      "highlights": ["No location restriction"]
+    }
+  },
+  {
+    "id": "demo-interested-5",
+    "title": "Principal Product Manager",
+    "companyName": "Anchorpoint Labs",
+    "companyLogoUrl": null,
+    "locationRaw": "London (Hybrid)",
+    "originalPostedAt": "2026-09-06T09:00:00+00:00",
+    "discoveredAt": "2026-09-06T10:00:00+00:00",
+    "status": "interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 76,
+      "categoryScores": { "skills": 78, "experience": 74, "domain_industry": 72, "seniority": 79 },
+      "overview": "Good fit — principal-level scope matches seniority well; hybrid London role, domain (dev tools) is closely related.",
+      "highlights": ["Principal level matches seniority", "Dev-tools domain closely related", "Hybrid — partial flexibility"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Hybrid role in London, workable with occasional office days.",
+      "highlights": ["Hybrid schedule"]
+    }
+  },
+  {
+    "id": "demo-interested-6",
+    "title": "Senior Product Manager, Commerce",
+    "companyName": "Vantage Retail",
+    "companyLogoUrl": null,
+    "locationRaw": "Warsaw",
+    "originalPostedAt": "2026-09-09T09:00:00+00:00",
+    "discoveredAt": "2026-09-09T10:00:00+00:00",
+    "status": "interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 71,
+      "categoryScores": { "skills": 73, "experience": 70, "domain_industry": 65, "seniority": 74 },
+      "overview": "Solid fit — senior commerce PM role, retail/e-commerce domain is adjacent to prior B2B experience.",
+      "highlights": ["Senior scope matches", "E-commerce domain partially new", "Warsaw on-site, no remote mentioned"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "Warsaw office listed; remote policy not specified.",
+      "highlights": ["Remote policy unclear"]
+    }
+  },
+  {
+    "id": "demo-applied-1",
+    "title": "Senior Product Manager, Logistics",
+    "companyName": "Cobalt Freight",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote (EU)",
+    "originalPostedAt": "2026-08-29T09:00:00+00:00",
+    "discoveredAt": "2026-08-29T10:00:00+00:00",
+    "status": "applied",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 80,
+      "categoryScores": { "skills": 82, "experience": 79, "domain_industry": 76, "seniority": 82 },
+      "overview": "Strong fit — senior logistics-platform PM role, remote across the EU, close match to recent supply-chain product work.",
+      "highlights": ["Direct logistics-platform experience", "Fully remote", "Seniority matches well"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote across the EU.",
+      "highlights": ["No relocation required"]
+    }
+  },
+  {
+    "id": "demo-applied-2",
+    "title": "Product Manager, Platform Security",
+    "companyName": "Kestrel Security",
+    "companyLogoUrl": null,
+    "locationRaw": "Berlin (Hybrid)",
+    "originalPostedAt": "2026-08-31T09:00:00+00:00",
+    "discoveredAt": "2026-08-31T10:00:00+00:00",
+    "status": "applied",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 75,
+      "categoryScores": { "skills": 77, "experience": 74, "domain_industry": 68, "seniority": 76 },
+      "overview": "Good fit — platform-security PM role, hybrid Berlin; security domain is a modest stretch from recent work.",
+      "highlights": ["Platform PM background transfers well", "Security domain partially new", "Hybrid — some office time expected"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Hybrid role based in Berlin.",
+      "highlights": ["Hybrid, manageable commute"]
+    }
+  },
+  {
+    "id": "demo-applied-3",
+    "title": "Senior Product Manager, Payments",
+    "companyName": "Basecamp Finance",
+    "companyLogoUrl": null,
+    "locationRaw": "Amsterdam",
+    "originalPostedAt": "2026-08-27T09:00:00+00:00",
+    "discoveredAt": "2026-08-27T10:00:00+00:00",
+    "status": "applied",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 85,
+      "categoryScores": { "skills": 87, "experience": 84, "domain_industry": 85, "seniority": 85 },
+      "overview": "Excellent fit — senior payments PM role closely matches fintech background and seniority level.",
+      "highlights": ["Direct fintech/payments experience", "Seniority matches exactly", "Amsterdam base, office policy unclear"]
+    },
+    "locationFit": {
+      "verdict": "unknown",
+      "explanation": "Amsterdam office listed; hybrid/remote policy not specified.",
+      "highlights": ["Policy unclear from listing"]
+    }
+  },
+  {
+    "id": "demo-applied-4",
+    "title": "Group Product Manager, Data Infrastructure",
+    "companyName": "Nimbus Data",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote",
+    "originalPostedAt": "2026-09-02T09:00:00+00:00",
+    "discoveredAt": "2026-09-02T10:00:00+00:00",
+    "status": "applied",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 83,
+      "categoryScores": { "skills": 85, "experience": 81, "domain_industry": 82, "seniority": 84 },
+      "overview": "Excellent fit — group-level data-infrastructure PM role, fully remote, strong overlap with recent platform/data work.",
+      "highlights": ["Direct data-infrastructure overlap", "Fully remote", "Group-level seniority matches"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote, no location constraint.",
+      "highlights": ["No location restriction"]
+    }
+  },
+  {
+    "id": "demo-interviewing-1",
+    "title": "Senior Product Manager",
+    "companyName": "Orbit Logistics",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote (EU)",
+    "originalPostedAt": "2026-08-19T09:00:00+00:00",
+    "discoveredAt": "2026-08-19T10:00:00+00:00",
+    "status": "interviewing",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 87,
+      "categoryScores": { "skills": 88, "experience": 86, "domain_industry": 84, "seniority": 88 },
+      "overview": "Excellent fit — senior PM role at a logistics-tech company, remote across the EU, strong overlap with recent experience.",
+      "highlights": ["Strong domain and seniority match", "Fully remote", "Well into the interview process"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote across the EU.",
+      "highlights": ["No relocation required"]
+    }
+  },
+  {
+    "id": "demo-interviewing-2",
+    "title": "Lead Product Manager, Growth",
+    "companyName": "Highwire Studios",
+    "companyLogoUrl": null,
+    "locationRaw": "London (Hybrid)",
+    "originalPostedAt": "2026-08-21T09:00:00+00:00",
+    "discoveredAt": "2026-08-21T10:00:00+00:00",
+    "status": "interviewing",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 84,
+      "categoryScores": { "skills": 86, "experience": 82, "domain_industry": 80, "seniority": 85 },
+      "overview": "Strong fit — lead growth-PM role, hybrid London, close match to recent growth-focused product work.",
+      "highlights": ["Growth PM background matches well", "Lead-level seniority fits", "Hybrid — workable schedule"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Hybrid role in London, manageable with occasional office days.",
+      "highlights": ["Hybrid schedule"]
+    }
+  },
+  {
+    "id": "demo-rejected-1",
+    "title": "Senior Product Manager",
+    "companyName": "Thistle & Co",
+    "companyLogoUrl": null,
+    "locationRaw": "London",
+    "originalPostedAt": "2026-08-14T09:00:00+00:00",
+    "discoveredAt": "2026-08-14T10:00:00+00:00",
+    "status": "rejected",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 66,
+      "categoryScores": { "skills": 68, "experience": 64, "domain_industry": 60, "seniority": 68 },
+      "overview": "Reasonable fit on paper — senior scope and skills matched, but the process didn't move forward.",
+      "highlights": ["Senior level matched", "Domain only partially aligned", "London on-site, no remote mentioned"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "Fully on-site in London with no remote option mentioned.",
+      "highlights": ["No remote/hybrid option"]
+    }
+  },
+  {
+    "id": "demo-rejected-2",
+    "title": "Product Manager, Developer Tools",
+    "companyName": "Cinder Systems",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote",
+    "originalPostedAt": "2026-08-09T09:00:00+00:00",
+    "discoveredAt": "2026-08-09T10:00:00+00:00",
+    "status": "rejected",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 62,
+      "categoryScores": { "skills": 65, "experience": 60, "domain_industry": 55, "seniority": 63 },
+      "overview": "Moderate fit — dev-tools domain was a partial match, remote role, ultimately not selected.",
+      "highlights": ["Dev-tools domain partially new", "Fully remote", "Mid-level scope"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote, no location constraint.",
+      "highlights": ["No location restriction"]
+    }
+  },
+  {
+    "id": "demo-rejected-3",
+    "title": "Group Product Manager",
+    "companyName": "Bramble Health",
+    "companyLogoUrl": null,
+    "locationRaw": "Berlin",
+    "originalPostedAt": "2026-08-16T09:00:00+00:00",
+    "discoveredAt": "2026-08-16T10:00:00+00:00",
+    "status": "rejected",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 58,
+      "categoryScores": { "skills": 60, "experience": 57, "domain_industry": 50, "seniority": 62 },
+      "overview": "Moderate fit — group-level scope matched seniority, healthtech domain was a bigger stretch than expected.",
+      "highlights": ["Seniority matched", "Healthtech domain unfamiliar", "Berlin on-site expected"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "On-site in Berlin, no remote option mentioned.",
+      "highlights": ["No remote/hybrid option"]
+    }
+  },
+  {
+    "id": "demo-notint-1",
+    "title": "Product Manager, Industrial IoT",
+    "companyName": "Iron Gate Manufacturing",
+    "companyLogoUrl": null,
+    "locationRaw": "Stuttgart (On-site)",
+    "originalPostedAt": "2026-09-13T09:00:00+00:00",
+    "discoveredAt": "2026-09-13T10:00:00+00:00",
+    "status": "not_interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 34,
+      "categoryScores": { "skills": 38, "experience": 40, "domain_industry": 20, "seniority": 45 },
+      "overview": "Weak fit — industrial IoT/manufacturing domain is far from prior experience, fully on-site.",
+      "highlights": ["Domain mismatch: industrial IoT", "Fully on-site in Stuttgart", "Experience only loosely relevant"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "Fully on-site in Stuttgart, no remote option.",
+      "highlights": ["Relocation would be required"]
+    }
+  },
+  {
+    "id": "demo-notint-2",
+    "title": "Junior Product Manager",
+    "companyName": "Wavelength Audio",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote",
+    "originalPostedAt": "2026-09-11T09:00:00+00:00",
+    "discoveredAt": "2026-09-11T10:00:00+00:00",
+    "status": "not_interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 28,
+      "categoryScores": { "skills": 45, "experience": 15, "domain_industry": 40, "seniority": 10 },
+      "overview": "Poor seniority fit — junior-level role, well below current experience level, despite remote flexibility.",
+      "highlights": ["Junior level, underqualified for your seniority", "Fully remote", "Compensation band likely too low"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote.",
+      "highlights": ["No location restriction"]
+    }
+  },
+  {
+    "id": "demo-notint-3",
+    "title": "Product Manager, Loyalty",
+    "companyName": "Driftwood Travel",
+    "companyLogoUrl": null,
+    "locationRaw": "Lisbon (On-site)",
+    "originalPostedAt": "2026-09-14T09:00:00+00:00",
+    "discoveredAt": "2026-09-14T10:00:00+00:00",
+    "status": "not_interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 41,
+      "categoryScores": { "skills": 45, "experience": 42, "domain_industry": 30, "seniority": 48 },
+      "overview": "Weak-to-moderate fit — travel/loyalty domain is unfamiliar, fully on-site in Lisbon.",
+      "highlights": ["Domain mismatch: travel loyalty programs", "On-site in Lisbon", "Mid-level scope"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "Fully on-site in Lisbon, relocation implied.",
+      "highlights": ["Relocation required"]
+    }
+  },
+  {
+    "id": "demo-notint-4",
+    "title": "Product Owner, Claims",
+    "companyName": "Pinnacle Insurance",
+    "companyLogoUrl": null,
+    "locationRaw": "London (On-site)",
+    "originalPostedAt": "2026-09-07T09:00:00+00:00",
+    "discoveredAt": "2026-09-07T10:00:00+00:00",
+    "status": "not_interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 37,
+      "categoryScores": { "skills": 40, "experience": 38, "domain_industry": 30, "seniority": 40 },
+      "overview": "Weak fit — insurance claims domain unfamiliar, product-owner scope below typical seniority, fully on-site.",
+      "highlights": ["Below typical seniority level", "Insurance claims domain unfamiliar", "Fully on-site in London"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "Fully on-site in London, no remote option mentioned.",
+      "highlights": ["No remote/hybrid option"]
+    }
+  },
+  {
+    "id": "demo-notint-5",
+    "title": "Associate Product Manager",
+    "companyName": "Loom Commerce",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote",
+    "originalPostedAt": "2026-09-15T09:00:00+00:00",
+    "discoveredAt": "2026-09-15T10:00:00+00:00",
+    "status": "not_interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 25,
+      "categoryScores": { "skills": 35, "experience": 12, "domain_industry": 45, "seniority": 8 },
+      "overview": "Poor seniority fit — associate-level role well below current experience, despite relevant e-commerce domain.",
+      "highlights": ["Associate level, well below seniority", "E-commerce domain relevant", "Fully remote"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote.",
+      "highlights": ["No location restriction"]
+    }
+  },
+  {
+    "id": "demo-notint-6",
+    "title": "Senior Product Manager, Hardware",
+    "companyName": "Tundra Robotics",
+    "companyLogoUrl": null,
+    "locationRaw": "Munich (On-site)",
+    "originalPostedAt": "2026-09-09T09:00:00+00:00",
+    "discoveredAt": "2026-09-09T10:00:00+00:00",
+    "status": "not_interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 44,
+      "categoryScores": { "skills": 48, "experience": 50, "domain_industry": 25, "seniority": 55 },
+      "overview": "Moderate seniority fit but hardware/robotics domain is a significant departure from software product experience.",
+      "highlights": ["Hardware domain mismatch", "Senior level matches", "Fully on-site in Munich"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "Fully on-site in Munich, relocation implied.",
+      "highlights": ["Relocation required"]
+    }
+  },
+  {
+    "id": "demo-notint-7",
+    "title": "Product Manager, Ad Tech",
+    "companyName": "Parallax Media",
+    "companyLogoUrl": null,
+    "locationRaw": "Remote",
+    "originalPostedAt": "2026-09-05T09:00:00+00:00",
+    "discoveredAt": "2026-09-05T10:00:00+00:00",
+    "status": "not_interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 50,
+      "categoryScores": { "skills": 55, "experience": 52, "domain_industry": 40, "seniority": 53 },
+      "overview": "Moderate fit — ad-tech domain only loosely related to recent experience, fully remote.",
+      "highlights": ["Ad-tech domain loosely related", "Fully remote", "Mid-to-senior scope"]
+    },
+    "locationFit": {
+      "verdict": "fit",
+      "explanation": "Fully remote.",
+      "highlights": ["No location restriction"]
+    }
+  },
+  {
+    "id": "demo-notint-8",
+    "title": "Product Manager, Sustainability Reporting",
+    "companyName": "Greenfield Energy",
+    "companyLogoUrl": null,
+    "locationRaw": "Copenhagen (Hybrid)",
+    "originalPostedAt": "2026-09-12T09:00:00+00:00",
+    "discoveredAt": "2026-09-12T10:00:00+00:00",
+    "status": "not_interested",
+    "sourceUrl": "#",
+    "sourceName": "sample",
+    "isNew": false,
+    "compatibility": {
+      "overallScore": 46,
+      "categoryScores": { "skills": 50, "experience": 48, "domain_industry": 35, "seniority": 50 },
+      "overview": "Moderate fit — sustainability-reporting domain is unfamiliar, hybrid Copenhagen role would require relocation for office days.",
+      "highlights": ["Domain mismatch: sustainability reporting", "Hybrid, but Copenhagen-based", "Mid-level scope"]
+    },
+    "locationFit": {
+      "verdict": "no_fit",
+      "explanation": "Hybrid role based in Copenhagen — relocation likely needed for office days.",
+      "highlights": ["Relocation likely needed"]
+    }
+  }
+]

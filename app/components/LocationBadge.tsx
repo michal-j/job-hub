@@ -13,14 +13,18 @@ const VERDICT_STYLES: Record<
   unknown: { bg: "#fef3c7", fg: "#92400e", label: "Location: Unclear" },
 };
 
+const DEMO_TOOLTIP = "Not available in the demo — sign in to run real analysis.";
+
 export function LocationBadge({
   jobId,
   locationFit,
   onAnalyzed,
+  demoMode = false,
 }: {
   jobId: string;
   locationFit: JobListItem["locationFit"];
   onAnalyzed: (jobId: string, result: JobListItem["locationFit"]) => void;
+  demoMode?: boolean;
 }) {
   const [hovering, setHovering] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -59,16 +63,17 @@ export function LocationBadge({
     return (
       <div>
         <button
-          onClick={runAnalysis}
-          disabled={analyzing}
+          onClick={demoMode ? undefined : runAnalysis}
+          aria-disabled={demoMode || analyzing}
+          title={demoMode ? DEMO_TOOLTIP : undefined}
           style={{
             fontSize: 12,
             padding: "4px 10px",
             borderRadius: 6,
             border: "1px solid #d1d5db",
-            background: analyzing ? "#f3f4f6" : "white",
-            color: "#374151",
-            cursor: analyzing ? "default" : "pointer",
+            background: demoMode || analyzing ? "#f3f4f6" : "white",
+            color: demoMode ? "#9ca3af" : "#374151",
+            cursor: demoMode || analyzing ? "default" : "pointer",
           }}
         >
           {analyzing ? "Checking…" : "Check location"}
@@ -166,15 +171,15 @@ export function LocationBadge({
                 AI-GENERATED
               </div>
               <button
-                onClick={runAnalysis}
-                disabled={analyzing}
-                title="Re-check location fit"
+                onClick={demoMode ? undefined : runAnalysis}
+                aria-disabled={demoMode || analyzing}
+                title={demoMode ? DEMO_TOOLTIP : "Re-check location fit"}
                 style={{
                   fontSize: 11,
                   border: "none",
                   background: "none",
-                  color: analyzing ? "#9ca3af" : "#374151",
-                  cursor: analyzing ? "default" : "pointer",
+                  color: demoMode || analyzing ? "#9ca3af" : "#374151",
+                  cursor: demoMode || analyzing ? "default" : "pointer",
                   textDecoration: "underline",
                 }}
               >

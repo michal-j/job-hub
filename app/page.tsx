@@ -1,5 +1,6 @@
 import { getJobList } from "@/lib/jobs";
 import { JobList } from "./components/JobList";
+import { SignOutButton } from "./components/SignOutButton";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -31,12 +32,15 @@ export default async function HomePage() {
         }}
       >
         <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0 }}>Job Hub</h1>
-        <a
-          href="/cv"
-          style={{ fontSize: 14, color: "#374151", textDecoration: "none" }}
-        >
-          Your CV →
-        </a>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <a
+            href="/cv"
+            style={{ fontSize: 14, color: "#374151", textDecoration: "none" }}
+          >
+            Your CV →
+          </a>
+          <SignOutButton />
+        </div>
       </div>
 
       {errorMessage && (

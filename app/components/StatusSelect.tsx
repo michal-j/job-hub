@@ -17,10 +17,12 @@ export function StatusSelect({
   jobId,
   status,
   onChange,
+  demoMode = false,
 }: {
   jobId: string;
   status: string;
   onChange: (jobId: string, newStatus: string) => void;
+  demoMode?: boolean;
 }) {
   const [saving, setSaving] = useState(false);
 
@@ -33,6 +35,13 @@ export function StatusSelect({
     // re-picks the status, which is an acceptable failure mode for a
     // personal single-user tool.
     onChange(jobId, newStatus);
+
+    // Demo mode has no backend at all — the parent already persisted this
+    // to localStorage via onChange above.
+    if (demoMode) {
+      setSaving(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/jobs/status", {

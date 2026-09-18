@@ -17,14 +17,18 @@ const CATEGORY_LABELS: Record<string, string> = {
   seniority: "Seniority",
 };
 
+const DEMO_TOOLTIP = "Not available in the demo — sign in to run real analysis.";
+
 export function CompatibilityBadge({
   jobId,
   compatibility,
   onAnalyzed,
+  demoMode = false,
 }: {
   jobId: string;
   compatibility: JobListItem["compatibility"];
   onAnalyzed: (jobId: string, result: JobListItem["compatibility"]) => void;
+  demoMode?: boolean;
 }) {
   const [hovering, setHovering] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -64,16 +68,17 @@ export function CompatibilityBadge({
     return (
       <div>
         <button
-          onClick={runAnalysis}
-          disabled={analyzing}
+          onClick={demoMode ? undefined : runAnalysis}
+          aria-disabled={demoMode || analyzing}
+          title={demoMode ? DEMO_TOOLTIP : undefined}
           style={{
             fontSize: 12,
             padding: "4px 10px",
             borderRadius: 6,
             border: "1px solid #d1d5db",
-            background: analyzing ? "#f3f4f6" : "white",
-            color: "#374151",
-            cursor: analyzing ? "default" : "pointer",
+            background: demoMode || analyzing ? "#f3f4f6" : "white",
+            color: demoMode ? "#9ca3af" : "#374151",
+            cursor: demoMode || analyzing ? "default" : "pointer",
           }}
         >
           {analyzing ? "Analyzing…" : "Analyze fit"}
@@ -171,15 +176,15 @@ export function CompatibilityBadge({
               AI-GENERATED
             </div>
             <button
-              onClick={runAnalysis}
-              disabled={analyzing}
-              title="Re-analyze with the latest CV"
+              onClick={demoMode ? undefined : runAnalysis}
+              aria-disabled={demoMode || analyzing}
+              title={demoMode ? DEMO_TOOLTIP : "Re-analyze with the latest CV"}
               style={{
                 fontSize: 11,
                 border: "none",
                 background: "none",
-                color: analyzing ? "#9ca3af" : "#374151",
-                cursor: analyzing ? "default" : "pointer",
+                color: demoMode || analyzing ? "#9ca3af" : "#374151",
+                cursor: demoMode || analyzing ? "default" : "pointer",
                 textDecoration: "underline",
               }}
             >

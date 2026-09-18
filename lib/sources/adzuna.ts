@@ -24,6 +24,10 @@ interface AdzunaResponse {
 const QUERIES = [
   { what: "Product Manager", where: "Poznań" },
   { what: "Product Manager remote", where: "" },
+  { what: "Head of Product", where: "Poznań" },
+  { what: "Head of Product remote", where: "" },
+  { what: "Product Operations", where: "Poznań" },
+  { what: "Product Operations remote", where: "" },
 ];
 
 export async function fetchAdzunaJobs(): Promise<NormalizedJob[]> {

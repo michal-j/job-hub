@@ -29,6 +29,10 @@ interface JoobleResponse {
 const QUERIES = [
   { keywords: "Product Manager", location: "Poznań" },
   { keywords: "Product Manager remote", location: "Poland" },
+  { keywords: "Head of Product", location: "Poznań" },
+  { keywords: "Head of Product remote", location: "Poland" },
+  { keywords: "Product Operations", location: "Poznań" },
+  { keywords: "Product Operations remote", location: "Poland" },
 ];
 
 function parseJoobleDate(value: string): string | null {

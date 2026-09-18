@@ -2,7 +2,8 @@
 // by keyword) need this client-side filter before anything gets stored
 // or sent to AI scoring — otherwise every department's postings would
 // flow through the pipeline.
-export const PM_TITLE_MATCH = /product\s*(manager|owner|management)/i;
+export const PM_TITLE_MATCH =
+  /(product\s*(manager|owner|management|operations|lead))|((head|director|vp|vice president)\s+(of\s+)?product)/i;
 
 export function stripHtml(html: string): string {
   return html

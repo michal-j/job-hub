@@ -21,15 +21,8 @@ export function SignOutButton() {
       onClick={handleClick}
       disabled={signingOut}
       title="Sign out"
-      style={{
-        fontSize: 13,
-        padding: "6px 12px",
-        borderRadius: 6,
-        border: "1px solid #d1d5db",
-        background: "white",
-        color: "#374151",
-        cursor: signingOut ? "default" : "pointer",
-      }}
+      className="btn"
+      style={{ cursor: signingOut ? "default" : "pointer", opacity: signingOut ? 0.6 : 1 }}
     >
       {signingOut ? "Signing out…" : "Sign out"}
     </button>

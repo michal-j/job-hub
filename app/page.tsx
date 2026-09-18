@@ -1,6 +1,6 @@
 import { getJobList } from "@/lib/jobs";
 import { JobList } from "./components/JobList";
-import { SignOutButton } from "./components/SignOutButton";
+import { AppHeader } from "./components/AppHeader";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -16,55 +16,41 @@ export default async function HomePage() {
   }
 
   return (
-    <main
-      style={{
-        maxWidth: 960,
-        margin: "48px auto",
-        padding: "0 24px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24,
-        }}
-      >
-        <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0 }}>Job Hub</h1>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <a
-            href="/cv"
-            style={{ fontSize: 14, color: "#374151", textDecoration: "none" }}
-          >
-            Your CV →
-          </a>
-          <SignOutButton />
-        </div>
-      </div>
+    <div className="app-shell">
+      <AppHeader active="jobs" />
+      <main className="main-container">
+        <h1 className="page-title">Jobs</h1>
 
-      {errorMessage && (
-        <div
-          style={{
-            background: "#fef2f2",
-            border: "1px solid #fecaca",
-            borderRadius: 8,
-            padding: 16,
-            color: "#991b1b",
-            marginBottom: 24,
-          }}
-        >
-          <strong>Couldn&apos;t load jobs:</strong> {errorMessage}
-        </div>
-      )}
+        {errorMessage && (
+          <div className="panel" style={{ marginTop: 20, color: "var(--score-low-fg)" }}>
+            <strong>Couldn&apos;t load jobs:</strong> {errorMessage}
+          </div>
+        )}
 
-      {!errorMessage && jobs.length === 0 && (
-        <p style={{ color: "#374151" }}>
-          No jobs yet. Trigger ingestion to pull some in.
-        </p>
-      )}
+        {!errorMessage && jobs.length === 0 && (
+          <div className="empty-state" style={{ marginTop: 24 }}>
+            <div className="glyph">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M4 13V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6M4 13l3.5 4h9L20 13M4 13h5.2a1 1 0 0 1 .9.55l.8 1.6a1 1 0 0 0 .9.55h.4a1 1 0 0 0 .9-.55l.8-1.6a1 1 0 0 1 .9-.55H20"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="empty-title">No jobs yet</div>
+            <div className="empty-sub">Trigger ingestion to pull some in.</div>
+          </div>
+        )}
 
-      {!errorMessage && jobs.length > 0 && <JobList initialJobs={jobs} />}
-    </main>
+        {!errorMessage && jobs.length > 0 && (
+          <div style={{ marginTop: 24 }}>
+            <JobList initialJobs={jobs} />
+          </div>
+        )}
+      </main>
+    </div>
   );
 }

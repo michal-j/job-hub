@@ -47,17 +47,7 @@ export function CvUploadForm() {
 
   return (
     <div>
-      <label
-        style={{
-          display: "inline-block",
-          padding: "10px 16px",
-          background: "#111827",
-          color: "white",
-          borderRadius: 8,
-          fontSize: 14,
-          cursor: "pointer",
-        }}
-      >
+      <label className="btn btn-primary" style={{ display: "inline-block", padding: "10px 16px" }}>
         {status === "uploading" ? "Uploading…" : "Upload CV (PDF)"}
         <input
           type="file"
@@ -68,11 +58,7 @@ export function CvUploadForm() {
         />
       </label>
 
-      {status === "error" && (
-        <p style={{ color: "#991b1b", fontSize: 14, marginTop: 8 }}>
-          {errorMessage}
-        </p>
-      )}
+      {status === "error" && <p className="error-text">{errorMessage}</p>}
     </div>
   );
 }

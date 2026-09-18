@@ -4,10 +4,10 @@ import { useState } from "react";
 import type { JobListItem } from "@/lib/jobs";
 import { usePopupDirection } from "./usePopupDirection";
 
-function scoreColor(score: number): { bg: string; fg: string } {
-  if (score >= 75) return { bg: "#d1fae5", fg: "#065f46" };
-  if (score >= 50) return { bg: "#fef3c7", fg: "#92400e" };
-  return { bg: "#fee2e2", fg: "#991b1b" };
+function scoreClass(score: number): "high" | "mid" | "low" {
+  if (score >= 75) return "high";
+  if (score >= 50) return "mid";
+  return "low";
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -68,31 +68,23 @@ export function CompatibilityBadge({
     return (
       <div>
         <button
+          className="btn-ghost"
           onClick={demoMode ? undefined : runAnalysis}
           aria-disabled={demoMode || analyzing}
           title={demoMode ? DEMO_TOOLTIP : undefined}
           style={{
-            fontSize: 12,
-            padding: "4px 10px",
-            borderRadius: 6,
-            border: "1px solid #d1d5db",
-            background: demoMode || analyzing ? "#f3f4f6" : "white",
-            color: demoMode ? "#9ca3af" : "#374151",
+            opacity: demoMode || analyzing ? 0.5 : 1,
             cursor: demoMode || analyzing ? "default" : "pointer",
           }}
         >
           {analyzing ? "Analyzing…" : "Analyze fit"}
         </button>
-        {error && (
-          <div style={{ fontSize: 12, color: "#991b1b", marginTop: 4 }}>
-            {error}
-          </div>
-        )}
+        {error && <div className="error-text">{error}</div>}
       </div>
     );
   }
 
-  const colors = scoreColor(compatibility.overallScore);
+  const cls = scoreClass(compatibility.overallScore);
 
   return (
     <div
@@ -106,17 +98,10 @@ export function CompatibilityBadge({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          fontSize: 13,
-          fontWeight: 700,
-          padding: "4px 10px",
-          borderRadius: 6,
-          background: colors.bg,
-          color: colors.fg,
-          cursor: "default",
-          whiteSpace: "nowrap",
-        }}
+        className={`score ${cls}`}
+        style={{ cursor: "default" }}
       >
+        <span className="ring" />
         {compatibility.overallScore}% match
       </div>
 
@@ -125,107 +110,44 @@ export function CompatibilityBadge({
           onClick={(e) => e.stopPropagation()}
           style={
             direction === "up"
-              ? {
-                  position: "absolute",
-                  bottom: "100%",
-                  paddingBottom: 6,
-                  right: 0,
-                  zIndex: 20,
-                  width: 320,
-                }
-              : {
-                  position: "absolute",
-                  top: "100%",
-                  paddingTop: 6,
-                  right: 0,
-                  zIndex: 20,
-                  width: 320,
-                }
+              ? { position: "absolute", bottom: "100%", paddingBottom: 6, right: 0, zIndex: 20, width: 320 }
+              : { position: "absolute", top: "100%", paddingTop: 6, right: 0, zIndex: 20, width: 320 }
           }
         >
-          <div
-            style={{
-              padding: 14,
-              background: "white",
-              border: "1px solid #e5e7eb",
-              borderRadius: 10,
-              boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-              fontSize: 13,
-              color: "#374151",
-              textAlign: "left",
-            }}
-          >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 8,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: "#92400e",
-                background: "#fef3c7",
-                borderRadius: 4,
-                padding: "1px 6px",
-              }}
-            >
-              AI-GENERATED
+          <div className="popover">
+            <div className="popover-header">
+              <span className="tag-ai">AI-GENERATED</span>
+              <button
+                className="popover-reanalyze"
+                onClick={demoMode ? undefined : runAnalysis}
+                aria-disabled={demoMode || analyzing}
+                title={demoMode ? DEMO_TOOLTIP : "Re-analyze with the latest CV"}
+                style={{ opacity: demoMode || analyzing ? 0.5 : 1 }}
+              >
+                {analyzing ? "Re-analyzing…" : "↻ Re-analyze"}
+              </button>
             </div>
-            <button
-              onClick={demoMode ? undefined : runAnalysis}
-              aria-disabled={demoMode || analyzing}
-              title={demoMode ? DEMO_TOOLTIP : "Re-analyze with the latest CV"}
-              style={{
-                fontSize: 11,
-                border: "none",
-                background: "none",
-                color: demoMode || analyzing ? "#9ca3af" : "#374151",
-                cursor: demoMode || analyzing ? "default" : "pointer",
-                textDecoration: "underline",
-              }}
-            >
-              {analyzing ? "Re-analyzing…" : "↻ Re-analyze"}
-            </button>
-          </div>
 
-          {error && (
-            <div style={{ color: "#991b1b", marginBottom: 8 }}>{error}</div>
-          )}
+            {error && <div className="error-text">{error}</div>}
 
-          <p style={{ margin: "0 0 10px 0" }}>{compatibility.overview}</p>
+            <p>{compatibility.overview}</p>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "4px 12px",
-              marginBottom: 10,
-            }}
-          >
-            {Object.entries(compatibility.categoryScores).map(
-              ([key, val]) => (
-                <div
-                  key={key}
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                >
+            <div className="popover-grid">
+              {Object.entries(compatibility.categoryScores).map(([key, val]) => (
+                <div key={key} style={{ display: "flex", justifyContent: "space-between" }}>
                   <span>{CATEGORY_LABELS[key] ?? key}</span>
-                  <span style={{ fontWeight: 600 }}>{val}%</span>
+                  <b>{val}%</b>
                 </div>
-              )
-            )}
-          </div>
-
-          {compatibility.highlights?.length > 0 && (
-            <ul style={{ margin: 0, padding: "0 0 0 16px" }}>
-              {compatibility.highlights.map((h, i) => (
-                <li key={i}>{h}</li>
               ))}
-            </ul>
-          )}
+            </div>
+
+            {compatibility.highlights?.length > 0 && (
+              <ul>
+                {compatibility.highlights.map((h, i) => (
+                  <li key={i}>{h}</li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       )}

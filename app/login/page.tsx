@@ -33,101 +33,77 @@ export default function LoginPage() {
   }
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 360,
-          border: "1px solid #e5e7eb",
-          borderRadius: 12,
-          padding: 32,
-        }}
-      >
-        <h1 style={{ fontSize: 18, fontWeight: 700, margin: "0 0 24px 0" }}>
-          Job Hub
-        </h1>
+    <main className="login-page">
+      <div className="login-brand">
+        <div className="login-brand-name">Job Hub</div>
+      </div>
+      <p className="login-tagline">
+        Pulls new Product Manager roles daily, scores each one against your
+        CV with Claude, and tracks them from first look to offer.
+      </p>
 
-        <form onSubmit={handleSubmit}>
-          <label style={{ display: "block", marginBottom: 16 }}>
-            <span style={{ display: "block", fontSize: 13, color: "#6b7280", marginBottom: 6 }}>
-              Email
-            </span>
-            <input
-              type="email"
-              autoComplete="username"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                border: "1px solid #d1d5db",
-                borderRadius: 6,
-                padding: "10px 12px",
-                fontSize: 14,
-              }}
-            />
-          </label>
+      <div className="login-cards">
+        <div className="login-card">
+          <div className="login-card-icon indigo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="2" />
+              <path d="M8 11V7a4 4 0 1 1 8 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <h2>Sign in</h2>
+          <p className="login-card-sub">Your personal dashboard — jobs, CV, and AI scoring.</p>
 
-          <label style={{ display: "block", marginBottom: 16 }}>
-            <span style={{ display: "block", fontSize: 13, color: "#6b7280", marginBottom: 6 }}>
-              Password
-            </span>
-            <input
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={{
-                width: "100%",
-                boxSizing: "border-box",
-                border: "1px solid #d1d5db",
-                borderRadius: 6,
-                padding: "10px 12px",
-                fontSize: 14,
-              }}
-            />
-          </label>
+          <form onSubmit={handleSubmit}>
+            <label className="login-field">
+              <span>Email</span>
+              <input
+                type="email"
+                autoComplete="username"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
 
-          {error && (
-            <p style={{ fontSize: 13, color: "#991b1b", margin: "0 0 12px 0" }}>
-              {error}
-            </p>
-          )}
+            <label className="login-field">
+              <span>Password</span>
+              <input
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            style={{
-              width: "100%",
-              padding: "10px 0",
-              borderRadius: 6,
-              border: "none",
-              background: submitting ? "#9ca3af" : "#111827",
-              color: "white",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: submitting ? "default" : "pointer",
-            }}
-          >
-            {submitting ? "Signing in…" : "Sign in"}
-          </button>
-        </form>
+            {error && <p className="login-error">{error}</p>}
 
-        <p style={{ textAlign: "center", fontSize: 13, color: "#6b7280", marginTop: 20, marginBottom: 0 }}>
-          <a href="/demo" style={{ color: "#111827" }}>
-            Or try the public demo →
+            <button type="submit" disabled={submitting} className="login-submit">
+              {submitting ? "Signing in…" : "Sign in"}
+            </button>
+          </form>
+        </div>
+
+        <div className="login-card">
+          <div className="login-card-icon teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+              <path d="M10 9l5 3-5 3V9z" fill="currentColor" />
+            </svg>
+          </div>
+          <h2>Try the demo</h2>
+          <p className="login-card-sub">See the whole app, no login required.</p>
+
+          <ul className="login-demo-list">
+            <li>Listings pulled daily from multiple job boards</li>
+            <li>Each one scored against a CV, powered by Claude</li>
+            <li>Track status from new lead to offer</li>
+          </ul>
+
+          <a href="/demo" className="login-demo-cta">
+            Open the demo →
           </a>
-        </p>
+        </div>
       </div>
     </main>
   );

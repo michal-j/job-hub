@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { StatusSelect } from "./StatusSelect";
 import { CompatibilityBadge } from "./CompatibilityBadge";
 import { LocationBadge } from "./LocationBadge";
-import { STATUS_STYLES } from "./statusStyles";
+import { statusColorVar } from "./statusStyles";
 import { loadDemoJobs, saveDemoJobs } from "@/lib/demoJobs";
 import type { JobListItem } from "@/lib/jobs";
 
@@ -35,9 +35,10 @@ function CompanyLogo({ name, logoUrl }: { name: string; logoUrl: string | null }
       <img
         src={logoUrl}
         alt=""
-        width={32}
-        height={32}
-        style={{ borderRadius: 7, objectFit: "contain", background: "#f3f4f6", flexShrink: 0 }}
+        width={34}
+        height={34}
+        className="job-logo"
+        style={{ objectFit: "contain" }}
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = "none";
         }}
@@ -52,25 +53,7 @@ function CompanyLogo({ name, logoUrl }: { name: string; logoUrl: string | null }
     .map((w) => w[0]?.toUpperCase())
     .join("");
 
-  return (
-    <div
-      style={{
-        width: 32,
-        height: 32,
-        borderRadius: 7,
-        background: "#e5e7eb",
-        color: "#4b5563",
-        fontSize: 12,
-        fontWeight: 700,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-      }}
-    >
-      {initials || "?"}
-    </div>
-  );
+  return <div className="job-logo">{initials || "?"}</div>;
 }
 
 export function JobList({
@@ -137,20 +120,13 @@ export function JobList({
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+      <div className="filters">
         {FILTER_OPTIONS.map((opt) => (
           <button
             key={opt.value}
+            className="pill"
+            aria-pressed={filter === opt.value}
             onClick={() => setFilter(opt.value)}
-            style={{
-              fontSize: 13,
-              padding: "6px 12px",
-              borderRadius: 999,
-              border: "1px solid #d1d5db",
-              background: filter === opt.value ? "#111827" : "white",
-              color: filter === opt.value ? "white" : "#374151",
-              cursor: "pointer",
-            }}
           >
             {opt.label}
           </button>
@@ -158,35 +134,21 @@ export function JobList({
       </div>
 
       {availableSources.length > 1 && (
-        <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
+        <div className="filters sub">
           <button
+            className="pill"
+            aria-pressed={sourceFilter === "all"}
             onClick={() => setSourceFilter("all")}
-            style={{
-              fontSize: 12,
-              padding: "4px 10px",
-              borderRadius: 999,
-              border: "1px solid #e5e7eb",
-              background: sourceFilter === "all" ? "#374151" : "#f9fafb",
-              color: sourceFilter === "all" ? "white" : "#6b7280",
-              cursor: "pointer",
-            }}
           >
             All sources
           </button>
           {availableSources.map((source) => (
             <button
               key={source}
+              className="pill"
+              aria-pressed={sourceFilter === source}
               onClick={() => setSourceFilter(source)}
-              style={{
-                fontSize: 12,
-                padding: "4px 10px",
-                borderRadius: 999,
-                border: "1px solid #e5e7eb",
-                background: sourceFilter === source ? "#374151" : "#f9fafb",
-                color: sourceFilter === source ? "white" : "#6b7280",
-                cursor: "pointer",
-                textTransform: "capitalize",
-              }}
+              style={{ textTransform: "capitalize" }}
             >
               {source}
             </button>
@@ -194,97 +156,64 @@ export function JobList({
         </div>
       )}
 
-      <p style={{ color: "#6b7280", marginTop: 0, marginBottom: 16, fontSize: 14 }}>
-        {visibleJobs.length} job{visibleJobs.length === 1 ? "" : "s"}
+      <div className="list-divider" />
+
+      <p className="count-chip" style={{ margin: "0 0 16px" }}>
+        <b>{visibleJobs.length}</b> job{visibleJobs.length === 1 ? "" : "s"}
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {visibleJobs.map((job) => {
-          const statusStyle = STATUS_STYLES[job.status] ?? STATUS_STYLES.new;
-          return (
-            <div
-              key={job.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                border: "1px solid #e5e7eb",
-                borderLeft: `4px solid ${statusStyle.border}`,
-                borderRadius: 10,
-                padding: "10px 16px",
-                background: statusStyle.tint,
-              }}
-            >
+      {visibleJobs.length === 0 ? (
+        <div className="empty-state">
+          <div className="glyph">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" strokeWidth="1.8" />
+              <path d="M20 20L15.2 15.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </div>
+          <div className="empty-title">No jobs match this filter</div>
+          <div className="empty-sub">Try a different status or source.</div>
+        </div>
+      ) : (
+        <div className="job-list">
+          {visibleJobs.map((job, i) => (
+            <div key={job.id} className="job-row">
+              <span className="job-index">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div
+                className="job-stripe"
+                style={{ background: statusColorVar(job.status) }}
+              />
               <CompanyLogo name={job.companyName} logoUrl={job.companyLogoUrl} />
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+              <div className="job-main">
+                <div className="job-title-row">
                   {job.sourceUrl && job.sourceUrl !== "#" ? (
                     <a
                       href={job.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{
-                        fontSize: 15,
-                        fontWeight: 600,
-                        color: "#111827",
-                        textDecoration: "none",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
+                      className="job-title"
                     >
                       {job.title}
                     </a>
                   ) : (
-                    <span
-                      style={{
-                        fontSize: 15,
-                        fontWeight: 600,
-                        color: "#111827",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {job.title}
-                    </span>
+                    <span className="job-title">{job.title}</span>
                   )}
-                  {job.isNew && (
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: "#065f46",
-                        background: "#d1fae5",
-                        borderRadius: 4,
-                        padding: "1px 5px",
-                        flexShrink: 0,
-                      }}
-                    >
-                      NEW
-                    </span>
-                  )}
+                  <span className="job-company-inline">{job.companyName}</span>
+                  {job.isNew && <span className="badge-new">NEW</span>}
                 </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#6b7280",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {job.companyName}
-                  {job.locationRaw ? ` · ${job.locationRaw}` : ""}
-                  {" · "}
+                <div className="job-meta">
+                  <span className="meta-company">{job.companyName}</span>
+                  <span className="dot">·</span>
+                  {job.locationRaw ? `${job.locationRaw} · ` : ""}
                   {formatDate(job.originalPostedAt)}
                   {" · "}
                   {job.sourceName}
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <div className="job-actions">
                 <StatusSelect
                   jobId={job.id}
                   status={job.status}
@@ -305,9 +234,9 @@ export function JobList({
                 />
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

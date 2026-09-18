@@ -1,12 +1,21 @@
-# Job Hub — Milestone 2
+# Job Hub
 
-Password-gated app shell + working Adzuna ingestion, triggered manually.
-Scheduled automation and the list UI come in later milestones.
+A personal job-search dashboard: pulls new listings from several sources
+daily, scores each one against your CV with Claude, flags whether the
+location/remote terms actually work for you, and lets you track status
+(new → interested → applied → interviewing → rejected/offer) as you work
+through them. Single-owner, real Supabase auth, deployed on Vercel.
+
+For the full picture of how this app is built — architecture, data model,
+every feature, known gaps, deployment gotchas — see
+[`HANDOFF.md`](./HANDOFF.md). This file is just setup/day-to-day usage.
 
 ## Setup
 
 1. **Create a Supabase project** at supabase.com (free tier).
-   - In the SQL Editor, paste and run `supabase/schema.sql`.
+   - In the SQL Editor, run `supabase/schema.sql`, then every file in
+     `supabase/migrations/` in order (each is a one-time `alter table`/
+     `insert` — see `HANDOFF.md` §5 for what each one did).
    - In Project Settings > API, copy the **Project URL**, the
      **service_role** key, and the **anon/publishable** key.
    - On the Authentication > Sign In / Up page (the page-level toggle,
@@ -31,16 +40,21 @@ Scheduled automation and the list UI come in later milestones.
    `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and
    `OWNER_EMAIL` (the email of the user you created above).
 
-   Also sign up free at https://developer.adzuna.com/ (instant, no
-   approval wait) and fill in `ADZUNA_APP_ID` / `ADZUNA_APP_KEY`.
+   Then sign up for whichever job sources you want (all free, no approval
+   wait): `ADZUNA_APP_ID`/`ADZUNA_APP_KEY` at
+   https://developer.adzuna.com/, `JOOBLE_API_KEY` at
+   https://jooble.org/api/about. Arbeitnow, Remotive, and the company-board
+   sources (Greenhouse/Ashby/SmartRecruiters/Personio) need no key.
+
+   `ANTHROPIC_API_KEY` powers CV extraction and the two AI analyses
+   (compatibility, location fit) — get one at console.anthropic.com.
 
 4. **Run locally**
    ```
    npm run dev
    ```
    Open http://localhost:3000 — you'll be redirected to `/login`. Sign in
-   with the account you created above. You should see "Connected to
-   Supabase. No jobs yet."
+   with the account you created above.
 
    `/demo` is a public route with no login required — a frozen sample
    dataset with edits kept in `localStorage` only, no Supabase or
@@ -52,30 +66,35 @@ Scheduled automation and the list UI come in later milestones.
 1. Push this repo to GitHub.
 2. Import it in Vercel.
 3. In Vercel's Project Settings > Environment Variables, add the same
-   variables from `.env.local` (never commit `.env.local` itself — it's
+   variables from `.env.local` — for each one, enable both **Production**
+   and **Preview** (unless you specifically want it scoped narrower), and
+   leave "Git Branch" empty (never commit `.env.local` itself, it's
    gitignored).
 4. Deploy. `/login` will gate the live URL the same way it does locally;
-   `/demo` stays public.
+   `/demo` stays public. `vercel.json` wires up the daily Cron schedule
+   for each ingestion source automatically.
 
-## Trying ingestion
+## Day-to-day usage
 
-Ingestion routes are gated by middleware like everything else, so a plain
-`curl` can't trigger them — sign in in the browser first, then run the
-fetch from the browser console (it'll carry your session cookie):
+**Upload your CV** at `/cv` (PDF only) — this powers the compatibility
+scoring. Re-upload any time; every upload is kept, the most recent one is
+what's used.
+
+**Ingestion** runs automatically once a day per source (see `vercel.json`
+for the schedule). To trigger one manually, sign in in the browser first,
+then run the fetch from the browser console (it'll carry your session
+cookie — plain `curl` can't, since ingestion routes are gated by
+middleware like everything else):
 
 ```js
 fetch("/api/ingest/adzuna", { method: "POST" }).then((r) => r.json()).then(console.log)
 ```
 
-Response looks like `{"jobsFound": 34, "jobsNew": 34}`. Run it twice in a
-row — the second run should report `jobsNew: 0` since everything's already
-deduped. Check the Supabase table editor to see real rows in `job`,
-`job_listing`, and `company`.
+Response looks like `{"jobsFound": 34, "jobsNew": 12}`. Vercel Cron itself
+uses a separate `Bearer` token (`CRON_SECRET`), unaffected by any of
+this — see `middleware.ts`.
 
-Vercel Cron uses a separate `Bearer` token (`CRON_SECRET`), unaffected by
-any of this — see `middleware.ts`.
-
-## What's next (milestone 3)
-
-A list UI reading from the `job` table — title, company, location, posted
-date, source link.
+**Analyzing a job**: new jobs are auto-analyzed at ingestion time if a CV
+is on file. Use the "Analyze fit" / "Check location" buttons (or
+"↻ Re-analyze" / "↻ Re-check" once a result exists) to run either one for
+an individual job on demand — e.g. after uploading a new CV.

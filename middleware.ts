@@ -52,7 +52,17 @@ export async function middleware(request: NextRequest) {
 
   const { data } = await supabase.auth.getUser();
 
-  if (!data.user) {
+  // Not just "is there a session" — this is a single-owner app, so a
+  // session for anyone other than the owner's account (e.g. someone who
+  // self-registered before signups got disabled in the Supabase
+  // dashboard) must be rejected too. Belt-and-suspenders alongside
+  // disabling signups there.
+  const isOwner =
+    !!data.user &&
+    !!process.env.OWNER_EMAIL &&
+    data.user.email === process.env.OWNER_EMAIL;
+
+  if (!isOwner) {
     if (request.nextUrl.pathname.startsWith("/api/")) {
       return NextResponse.json(
         { error: "Authentication required" },

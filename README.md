@@ -9,11 +9,14 @@ Scheduled automation and the list UI come in later milestones.
    - In the SQL Editor, paste and run `supabase/schema.sql`.
    - In Project Settings > API, copy the **Project URL**, the
      **service_role** key, and the **anon/publishable** key.
-   - In Authentication > Providers > Email, turn **off** "Allow new users
-     to sign up" — this is a single-owner app, not a multi-user one.
+   - On the Authentication > Sign In / Up page (the page-level toggle,
+     not inside a specific provider's settings), turn **off** "Allow new
+     users to sign up" — this is a single-owner app, not a multi-user one.
    - In Authentication > Users, click "Add user" and create your one
      account (your email + a password of your choosing). That's your
-     Job Hub login.
+     Job Hub login — and also the value for `OWNER_EMAIL` below, which is
+     a second, code-level check so a session for any other email is
+     rejected too, even if signups ever end up re-enabled by mistake.
 
 2. **Install dependencies**
    ```
@@ -25,7 +28,8 @@ Scheduled automation and the list UI come in later milestones.
    cp .env.local.example .env.local
    ```
    Fill in `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
-   `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and
+   `OWNER_EMAIL` (the email of the user you created above).
 
    Also sign up free at https://developer.adzuna.com/ (instant, no
    approval wait) and fill in `ADZUNA_APP_ID` / `ADZUNA_APP_KEY`.

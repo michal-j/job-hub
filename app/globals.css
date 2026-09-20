@@ -390,7 +390,12 @@ a {
   border-radius: 0;
 }
 
-.theme-switcher button[aria-pressed="true"] {
+/* Keyed on [data-theme] (already correct before first paint, see
+   ThemeScript) rather than aria-pressed (React state, only correct
+   after hydration) — this is what actually stops the switcher's
+   highlighted pill from flashing to the wrong option on load. */
+[data-theme="linear-dark"] .theme-switcher button[data-theme-option="linear-dark"],
+[data-theme="editorial-mono"] .theme-switcher button[data-theme-option="editorial-mono"] {
   background: var(--text-primary);
   color: var(--bg);
 }

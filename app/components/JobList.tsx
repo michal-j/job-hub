@@ -21,10 +21,19 @@ const FILTER_OPTIONS = [
 
 function formatDate(value: string | null): string {
   if (!value) return "—";
+  // Pinned to UTC deliberately: this is a client component, so it renders
+  // once on the server (build time, UTC on Vercel) and again during
+  // client hydration (the visitor's local timezone). Without an explicit
+  // timeZone, a date within a few hours of midnight UTC can format to a
+  // different calendar day on each side, which is a text-content
+  // hydration mismatch — React then discards the whole tree and
+  // re-renders client-only, silently wiping any DOM state set before
+  // hydration (e.g. the theme's data-theme attribute).
   return new Date(value).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   });
 }
 

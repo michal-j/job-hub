@@ -7,10 +7,15 @@ export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 
 function formatDate(value: string) {
+  // Pinned to UTC for consistency with JobList's formatDate — this one's
+  // a server component so it isn't hydration-sensitive today, but it'd
+  // become so if this ever changed, and there's no reason for it to
+  // disagree with the rest of the app about what "18 Sept" means.
   return new Date(value).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
+    timeZone: "UTC",
   });
 }
 

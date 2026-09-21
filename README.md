@@ -98,3 +98,15 @@ this — see `middleware.ts`.
 is on file. Use the "Analyze fit" / "Check location" buttons (or
 "↻ Re-analyze" / "↻ Re-check" once a result exists) to run either one for
 an individual job on demand — e.g. after uploading a new CV.
+
+## Testing
+
+```
+npm test
+```
+
+Runs the Vitest unit suite (pure logic only — dedup hashing, source
+filtering, demo persistence, theme color mapping). It doesn't touch
+Supabase or Anthropic. For everything else — auth, ingestion, CV
+upload, AI analysis, responsive layout — see the manual test cases in
+[`TEST_CASES.md`](./TEST_CASES.md).

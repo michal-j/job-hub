@@ -30,10 +30,9 @@ export function CompatibilityBadge({
   onAnalyzed: (jobId: string, result: JobListItem["compatibility"]) => void;
   demoMode?: boolean;
 }) {
-  const [hovering, setHovering] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState("");
-  const { triggerRef, direction, measureAndOpen } = usePopupDirection();
+  const { triggerRef, direction, open, measureAndOpen, closePopup } = usePopupDirection();
 
   async function runAnalysis(e: React.MouseEvent) {
     e.stopPropagation();
@@ -90,14 +89,14 @@ export function CompatibilityBadge({
     <div
       ref={triggerRef}
       style={{ position: "relative", display: "inline-block" }}
-      onMouseEnter={() => {
-        measureAndOpen();
-        setHovering(true);
-      }}
-      onMouseLeave={() => setHovering(false)}
+      onMouseEnter={measureAndOpen}
+      onMouseLeave={closePopup}
     >
       <div
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          measureAndOpen();
+        }}
         className={`score ${cls}`}
         style={{ cursor: "default" }}
       >
@@ -105,14 +104,10 @@ export function CompatibilityBadge({
         {compatibility.overallScore}% match
       </div>
 
-      {hovering && (
+      {open && (
         <div
           onClick={(e) => e.stopPropagation()}
-          style={
-            direction === "up"
-              ? { position: "absolute", bottom: "100%", paddingBottom: 6, right: 0, zIndex: 20, width: 320 }
-              : { position: "absolute", top: "100%", paddingTop: 6, right: 0, zIndex: 20, width: 320 }
-          }
+          className={`popover-anchor ${direction === "up" ? "direction-up" : "direction-down"}`}
         >
           <div className="popover">
             <div className="popover-header">

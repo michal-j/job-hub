@@ -1,4 +1,4 @@
-# Job Hub — Handoff (current state, 2026-09-18)
+# Job Hub — Handoff (current state, 2026-09-21)
 
 This describes the app **as it actually is right now**, for a fresh
 Claude Code session with no memory of how it got here. Read this whole
@@ -84,9 +84,37 @@ supabase/migrations/*.sql       — run once each, in order, by hand in the
                                 Supabase SQL editor (no migration runner)
 vercel.json                     — daily Cron schedule, one entry per
                                 ingestion route, offset a few minutes apart
+*.test.ts                        — Vitest unit tests, colocated with the
+                                code they cover (lib/dedup.test.ts, etc.)
+                                — run with `npm test`
+vitest.config.ts                — jsdom environment + the same "@/" path
+                                alias as tsconfig, so tests can import
+                                app code the same way it imports itself
+TEST_CASES.md                    — human-readable test cases, automated
+                                and manual (see there for what's covered)
+CHANGELOG.md                     — Keep a Changelog; "Unreleased" means
+                                "not yet pushed to main", see its header
 ```
 
 **Run locally:** `npm run dev` → http://localhost:3000.
+
+**Responsive conventions (added 2026-09-21):** the job row's fixed-width
+controls (status select, score badge, location badge — none of them
+shrink) don't leave room for the title below ~620px, so
+`app/globals.css` stacks the row at that breakpoint. Two things make
+that possible without a full rewrite:
+- `JobList.tsx` wraps the logo + title/meta block in a `.job-heading`
+  div specifically so they wrap together as one unit, instead of the
+  title column being squeezed to zero width by the actions cluster next
+  to it (that's what used to happen).
+- `CompatibilityBadge`/`LocationBadge`'s popovers use a shared
+  `.popover-anchor` class (width capped with `min()` against the
+  viewport) instead of the inline fixed-pixel-width style they used to
+  have, and `usePopupDirection` now tracks an `open` state with a
+  document-level outside-click listener — hover alone never reaches
+  touch devices, so tapping the badge opens it and tapping elsewhere
+  closes it. Any new hover-triggered popover should follow the same
+  pattern rather than hover-only.
 
 ---
 
@@ -289,8 +317,12 @@ service-role key would ignore them anyway.
   production. A preview branch's `/api/ingest/*` routes still work
   manually (Cron secret or a signed-in session), they just won't fire on
   a schedule.
-- **This app has no test suite.** Verification so far has been
-  `npm run build` (catches type errors) plus manual browser
-  click-through, both locally and against a Vercel preview deployment
-  before merging. Keep doing both for anything touching auth, ingestion,
-  or the demo.
+- **Test coverage is intentionally partial.** `npm test` (Vitest) covers
+  pure logic with no Supabase/Anthropic/browser dependency — dedup
+  hashing, the company-board title filter, status→theme color mapping,
+  demo-mode localStorage persistence (see `TEST_CASES.md` for exactly
+  what). Everything that needs a real session, a live browser, or an
+  actual AI/PDF call is manual — walk through `TEST_CASES.md`'s manual
+  section, plus `npm run build` (catches type errors), both locally and
+  against a Vercel preview deployment before merging. Keep doing both
+  for anything touching auth, ingestion, or the demo.

@@ -193,32 +193,34 @@ export function JobList({
                 className="job-stripe"
                 style={{ background: statusColorVar(job.status) }}
               />
-              <CompanyLogo name={job.companyName} logoUrl={job.companyLogoUrl} />
+              <div className="job-heading">
+                <CompanyLogo name={job.companyName} logoUrl={job.companyLogoUrl} />
 
-              <div className="job-main">
-                <div className="job-title-row">
-                  {job.sourceUrl && job.sourceUrl !== "#" ? (
-                    <a
-                      href={job.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="job-title"
-                    >
-                      {job.title}
-                    </a>
-                  ) : (
-                    <span className="job-title">{job.title}</span>
-                  )}
-                  <span className="job-company-inline">{job.companyName}</span>
-                  {job.isNew && <span className="badge-new">NEW</span>}
-                </div>
-                <div className="job-meta">
-                  <span className="meta-company">{job.companyName}</span>
-                  <span className="dot">·</span>
-                  {job.locationRaw ? `${job.locationRaw} · ` : ""}
-                  {formatDate(job.originalPostedAt)}
-                  {" · "}
-                  {job.sourceName}
+                <div className="job-main">
+                  <div className="job-title-row">
+                    {job.sourceUrl && job.sourceUrl !== "#" ? (
+                      <a
+                        href={job.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="job-title"
+                      >
+                        {job.title}
+                      </a>
+                    ) : (
+                      <span className="job-title">{job.title}</span>
+                    )}
+                    <span className="job-company-inline">{job.companyName}</span>
+                    {job.isNew && <span className="badge-new">NEW</span>}
+                  </div>
+                  <div className="job-meta">
+                    <span className="meta-company">{job.companyName}</span>
+                    <span className="dot">·</span>
+                    {job.locationRaw ? `${job.locationRaw} · ` : ""}
+                    {formatDate(job.originalPostedAt)}
+                    {" · "}
+                    {job.sourceName}
+                  </div>
                 </div>
               </div>
 

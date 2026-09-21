@@ -185,6 +185,8 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 10px;
   padding: 20px clamp(20px, 4vw, 56px);
 }
 
@@ -192,6 +194,18 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Below this, brand + nav no longer both fit on one line — give the
+   nav cluster the full second line instead of letting text wrap
+   mid-word (the header-inner flex-wrap above handles the line break,
+   this just makes the wrapped nav line itself readable). */
+@media (max-width: 520px) {
+  .app-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .brand-mark {
@@ -216,12 +230,15 @@ a {
   font-size: 14.5px;
   letter-spacing: -0.01em;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .app-nav {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: clamp(10px, 3vw, 24px);
+  flex-wrap: wrap;
+  row-gap: 8px;
 }
 
 .nav-link {
@@ -229,6 +246,7 @@ a {
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .nav-link[aria-current="page"] {
@@ -666,6 +684,49 @@ a {
   flex-shrink: 0;
 }
 
+/* job-heading groups the logo + title/meta block so they wrap together
+   as one unit below, instead of the title column being independently
+   squeezed to zero width by the actions cluster next to it (that's what
+   used to happen: three flex-shrink:0 controls refusing to shrink left
+   no room at all for the title on narrow screens). */
+.job-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Below this, job-heading + job-actions no longer fit on one line at
+   any reasonable width — status select, score badge, and location
+   badge alone need ~350px (each has a fixed min-width and refuses to
+   shrink). Stack instead of letting the title collapse to nothing. */
+@media (max-width: 620px) {
+  .job-row {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .job-heading {
+    flex-basis: 100%;
+  }
+
+  .job-actions {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  /* The editorial-mono index number has nothing to sit next to once
+     job-heading drops to its own line — hide it rather than leave it
+     stranded alone above the card. (Matches the specificity of the
+     [data-theme="editorial-mono"] .job-index rule that turns it on,
+     since a plain .job-index here wouldn't win against it.) */
+  [data-theme="editorial-mono"] .job-index {
+    display: none;
+  }
+}
+
 /* ---------------------------------------------------------------------
    Controls: status select, score badge, location badge, ghost buttons
    ------------------------------------------------------------------- */
@@ -778,6 +839,32 @@ a {
   border-radius: 0;
   text-transform: uppercase;
   font-size: 11px;
+}
+
+/* Positioned wrapper around the compatibility/location popovers. Width
+   is capped with min() rather than a fixed px so it can never demand
+   more than the viewport has — on a ~340px-wide phone a flat 320px
+   would push past the edge depending on where its trigger badge
+   happens to sit in the wrapped .job-actions row. */
+.popover-anchor {
+  position: absolute;
+  right: 0;
+  z-index: 20;
+  width: min(320px, calc(100vw - 40px));
+}
+
+.popover-anchor.narrow {
+  width: min(300px, calc(100vw - 40px));
+}
+
+.popover-anchor.direction-down {
+  top: 100%;
+  padding-top: 6px;
+}
+
+.popover-anchor.direction-up {
+  bottom: 100%;
+  padding-bottom: 6px;
 }
 
 .popover {

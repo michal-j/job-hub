@@ -154,17 +154,36 @@ a {
    ------------------------------------------------------------------- */
 
 .app-shell {
+  position: relative;
+  z-index: 0;
   min-height: 100vh;
   background: var(--bg);
-  background-image: var(--bg-image);
-  /* The gradient's % positions are relative to this element's own box —
-     without `fixed`, that box grows taller on longer lists (e.g. "All"
-     vs "New"), so the same -10%/0% Y-offsets land in different places
-     and the gradient visibly fades by a different amount depending on
-     how many jobs are showing. `fixed` ties it to the viewport instead,
-     so it looks identical no matter how long the list is. */
-  background-attachment: fixed;
   color: var(--text-primary);
+}
+
+/* The gradient's % positions need to stay relative to the viewport, not
+   this element's own box — otherwise that box grows taller on longer
+   lists (e.g. "All" vs "New"), the same -10%/0% Y-offsets land in
+   different places, and the gradient visibly fades by a different
+   amount depending on how many jobs are showing. `background-attachment:
+   fixed` used to solve that, but it's notoriously unreliable on iOS
+   Safari/WebKit — the "fixed" background visibly shifts or repaints
+   inconsistently as the dynamic toolbar collapses/expands during scroll
+   (reported on iPhone 15 Pro, Linear theme only — Editorial has no
+   --bg-image so there's nothing to see). A `position: fixed` element is
+   properly supported there, so the gradient lives on this pseudo-element
+   instead of as a background-attachment on the scrolling box.
+   z-index: -1 keeps it behind .app-shell's actual content, which is why
+   .app-shell itself needs `z-index: 0` — that gives it its own stacking
+   context so this negative z-index can't end up behind something
+   unrelated elsewhere on the page. */
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--bg-image);
+  pointer-events: none;
 }
 
 .app-header {
@@ -845,10 +864,17 @@ a {
    is capped with min() rather than a fixed px so it can never demand
    more than the viewport has — on a ~340px-wide phone a flat 320px
    would push past the edge depending on where its trigger badge
-   happens to sit in the wrapped .job-actions row. */
+   happens to sit in the wrapped .job-actions row.
+   `left` is NOT set here — a flat `right: 0` (anchor flush with the
+   trigger's right edge) overflows off the left of the screen whenever
+   the trigger isn't near the row's own right edge, which happens
+   whenever the status select + score + location badges all fit on one
+   line together and the score badge ends up in the middle rather than
+   at the end. usePopupDirection computes a clamped `left` in JS instead
+   (see CompatibilityBadge/LocationBadge), the one thing that actually
+   knows the trigger's real on-screen position. */
 .popover-anchor {
   position: absolute;
-  right: 0;
   z-index: 20;
   width: min(320px, calc(100vw - 40px));
 }
@@ -865,6 +891,20 @@ a {
 .popover-anchor.direction-up {
   bottom: 100%;
   padding-bottom: 6px;
+}
+
+/* Covers the full viewport while a popover is open so the only thing a
+   tap/click can reach is the popover itself (or, by hitting this scrim,
+   close it) — without it, a tap meant to dismiss the popover can just as
+   easily land on a job's link, another badge, or the status dropdown
+   underneath. It has no click handler of its own: it's simply not
+   inside the trigger, so usePopupDirection's existing outside-click
+   listener already closes the popover when this is what gets clicked. */
+.popover-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  background: transparent;
 }
 
 .popover {
@@ -1128,7 +1168,12 @@ a {
   border: 1px solid #cbd5e1;
   border-radius: 9px;
   padding: 10px 12px;
-  font-size: 14px;
+  /* iOS Safari/Chrome auto-zooms the page on focus for any text input
+     with a computed font-size under 16px — and because signing in
+     navigates away client-side (no full page load), the zoomed-in scale
+     doesn't reset afterwards, leaving the whole app zoomed in on first
+     load. 16px is the minimum that avoids triggering it at all. */
+  font-size: 16px;
   font-family: inherit;
   background: #f8fafc;
   color: #0f172a;

@@ -27,6 +27,42 @@ project deploys straight from `main` with no version numbers, so
   for the same company/title differing only by `ł` vs `l` would hash to
   different values and fail to dedupe. Now handled with an explicit
   substitution before normalization.
+- Popovers could open partly off the left edge of the screen — anchoring
+  flush with the trigger's right edge overflows whenever the trigger
+  isn't near the row's own right edge, which happens whenever the
+  status select + score + location badges all fit on one line together
+  (common in Editorial Mono specifically, since its much tighter row
+  padding lets that happen at viewport widths where Linear Dark still
+  wraps to two lines). Position is now clamped into the viewport instead
+  of blindly trusting that anchor.
+- Tapping an open popover's own trigger again now closes it, the same
+  as tapping anywhere else outside it — previously tapping it again just
+  re-opened it with no way to dismiss without tapping elsewhere first.
+- While a popover is open, the rest of the page (job links, other
+  badges, the status dropdown) is no longer reachable underneath it — a
+  transparent scrim now catches those taps and closes the popover
+  instead of letting them accidentally trigger whatever was underneath.
+- [Linear theme] The page background could shift or repaint
+  inconsistently while scrolling on iOS Safari/Chrome —
+  `background-attachment: fixed` (used to keep the gradient consistent
+  across list lengths, see the "Added" 2026-09-18 entry) is unreliable
+  there. Replaced with a `position: fixed` pseudo-element, which iOS
+  handles correctly, without losing the original fix.
+- Login email/password inputs are now 16px (from 14px) — below that,
+  iOS auto-zooms the page on focus, and because signing in navigates
+  away without a full page reload, the zoomed-in scale was never being
+  reset afterwards, leaving the whole app zoomed in on first load.
+
+### Changed
+
+- `ThemeScript` now runs before the Google Fonts stylesheet link in
+  `<head>` instead of after — a classic `<script>` following a pending
+  `<link rel="stylesheet">` has its execution deferred until that
+  stylesheet loads, which could delay setting `data-theme` on a slow
+  connection. Not confirmed as the cause of a report that the demo page
+  reverted to the default theme on reload (not reproducible locally —
+  the mechanism otherwise checked out), but a legitimate hardening fix
+  regardless.
 
 ### Added
 

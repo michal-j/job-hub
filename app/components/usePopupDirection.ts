@@ -4,33 +4,80 @@ import { useEffect, useRef, useState } from "react";
 // than to render a popup that gets clipped by the viewport edge.
 const ESTIMATED_POPUP_HEIGHT = 280;
 
+// Keep the popover at least this far from either viewport edge.
+const VIEWPORT_MARGIN = 20;
+
+interface PopupPlacement {
+  direction: "up" | "down";
+  // Relative to the trigger's own top-left (the popover is positioned
+  // absolute inside the position:relative trigger wrapper) — NOT a
+  // viewport pixel value. Computed from viewport-space math so it can be
+  // clamped against the actual screen width, then converted back.
+  left: number;
+}
+
 export function usePopupDirection() {
   const triggerRef = useRef<HTMLDivElement>(null);
-  const [direction, setDirection] = useState<"up" | "down">("down");
   const [open, setOpen] = useState(false);
+  const [placement, setPlacement] = useState<PopupPlacement>({ direction: "down", left: 0 });
 
-  function measureAndOpen() {
+  // maxWidth must match the CSS class's own width cap (320 for
+  // .popover-anchor, 300 for .popover-anchor.narrow) — it's only used
+  // here to work out placement, not to size the element.
+  function measure(maxWidth: number): PopupPlacement {
     const rect = triggerRef.current?.getBoundingClientRect();
-    if (!rect) {
-      setDirection("down");
-    } else {
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
+    if (!rect) return { direction: "down", left: 0 };
 
-      // Prefer below (natural reading direction) unless there isn't room
-      // for it but there IS room above — then flip up.
-      setDirection(spaceBelow < ESTIMATED_POPUP_HEIGHT && spaceAbove > spaceBelow ? "up" : "down");
-    }
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    // Prefer below (natural reading direction) unless there isn't room
+    // for it but there IS room above — then flip up.
+    const direction: "up" | "down" =
+      spaceBelow < ESTIMATED_POPUP_HEIGHT && spaceAbove > spaceBelow ? "up" : "down";
+
+    // Anchoring flush with the trigger's right edge (this repo's
+    // original design) overflows off the left edge of the screen
+    // whenever the trigger isn't close enough to the right edge itself —
+    // e.g. when the status select + score + location badges all fit on
+    // one line together, the score badge sits in the *middle*, nowhere
+    // near the row's right edge. Clamp the left edge into the viewport
+    // instead of trusting that anchor blindly.
+    const width = Math.min(maxWidth, window.innerWidth - VIEWPORT_MARGIN * 2);
+    const naturalLeft = rect.right - width;
+    const clampedLeft = Math.max(
+      VIEWPORT_MARGIN,
+      Math.min(naturalLeft, window.innerWidth - width - VIEWPORT_MARGIN)
+    );
+
+    return { direction, left: clampedLeft - rect.left };
+  }
+
+  function openPopover(maxWidth: number) {
+    setPlacement(measure(maxWidth));
     setOpen(true);
   }
 
-  function closePopup() {
+  function closePopover() {
     setOpen(false);
   }
 
-  // Touch devices have no mouseleave, so tapping the trigger is the only
-  // way in — and tapping anywhere else has to be the way out, or the
-  // popover is stuck open until the next tap on the same badge.
+  // Touch devices have no hover, so the trigger itself has to double as
+  // an open/close switch — tapping it again should close it exactly like
+  // tapping anywhere else outside the popover does.
+  function togglePopover(maxWidth: number) {
+    if (open) {
+      closePopover();
+    } else {
+      openPopover(maxWidth);
+    }
+  }
+
+  // Closing on any click/tap outside the trigger+popover. This is also
+  // what lets the full-viewport scrim (rendered by the badge components
+  // while open, to stop the popover being open at the same time as the
+  // user accidentally hitting a job link or another badge underneath)
+  // close things when tapped — it doesn't need its own handler, it's
+  // simply not inside triggerRef, so this listener already covers it.
   useEffect(() => {
     if (!open) return;
 
@@ -48,5 +95,5 @@ export function usePopupDirection() {
     };
   }, [open]);
 
-  return { triggerRef, direction, open, measureAndOpen, closePopup };
+  return { triggerRef, open, placement, openPopover, closePopover, togglePopover };
 }

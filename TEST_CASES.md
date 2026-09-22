@@ -16,6 +16,23 @@ Run the automated tier with:
 npm test
 ```
 
+**If you are an AI agent working on this repo: actually run the manual
+cases below yourself, don't just read them and move on.** Every case that
+doesn't need real Supabase/Anthropic credentials (all of §"Demo mode",
+§"Job list — filtering & status" cases 10-12, all of §"Responsive layout")
+is reachable with nothing but a browser tool against `/demo` — there's no
+excuse to skip those and leave them for the user. Use the project's
+`preview_start`/browser tooling to open `/demo`, actually click through
+each one, and check the real result (DOM state, computed styles, a
+screenshot) rather than reasoning about the code and assuming it works —
+several real bugs in this app were only ever found by actually clicking
+through it (see `CHANGELOG.md`'s Unreleased section for examples: a
+touch-only popover bug, a dedup hash bug found by an automated test, and
+more). Only the cases explicitly marked "real app only" need credentials
+you won't have — for those, say clearly in your final report which
+specific cases you couldn't run and why, instead of silently skipping them
+or implying they were checked.
+
 ---
 
 ## Automated
@@ -130,7 +147,18 @@ npm test
     popovers) re-skins immediately, no partial/unstyled flash.
 22. **Theme persists across reload** — pick a theme, reload the page →
     same theme loads with no flash of the other theme's active pill
-    (this was a real bug, fixed 2026-09-20 — see `CHANGELOG.md`).
+    (this was a real bug, fixed 2026-09-20 — see `CHANGELOG.md`). This
+    was specifically re-verified on `/demo` on 2026-09-21 (picked
+    Editorial Mono, called `window.location.reload()`, confirmed both
+    `document.documentElement.getAttribute('data-theme')` and
+    `localStorage.getItem('jobHub.theme')` still read `editorial-mono`
+    afterwards) in response to a report of it reverting to Linear Dark
+    on reload with neither pill highlighted — that exact failure didn't
+    reproduce here. If it recurs, check the actual `data-theme` value at
+    that moment first (mismatched-but-present vs. genuinely missing —
+    they'd look identical but point to very different bugs), then
+    whether it's demo-mode-specific or happens on the real app's pages
+    too.
 23. **Theme is independent per browser** — the login page always renders
     its own neutral palette regardless of the last picked theme.
 
@@ -153,7 +181,12 @@ Use the browser's device toolbar (or resize the window) at roughly:
     a touch-emulated viewport → popover opens and stays within the
     viewport (no horizontal overflow); tapping anywhere outside it
     closes it. (Popovers used to be hover-only and were unreachable on
-    touch — fixed 2026-09-21, see `CHANGELOG.md`.)
+    touch — fixed 2026-09-21, see `CHANGELOG.md`.) Note: this app's
+    browser tool simulates real mouse events even under mobile-viewport
+    emulation, which fires hover before click and can make a popover
+    that just opened immediately close again — that's an artifact of
+    the tool, not a bug. To test the tap-only path faithfully, dispatch
+    a bare `click` event with no preceding `pointerover`/`mouseenter`.
 28. **Job row at tablet width (768px)** — title truncates with an
     ellipsis rather than disappearing; controls stay on one line, right
     aligned.
@@ -163,3 +196,38 @@ Use the browser's device toolbar (or resize the window) at roughly:
 30. **Desktop, wide window (1280px+)** — full one-line job rows, no
     wrapping, matches the original design exactly (this is the
     regression baseline — nothing above should change how this looks).
+31. **Popover doesn't overflow when the trigger isn't near the row's
+    right edge** — at a viewport width where the status select + score
+    + location badges all fit on one line together (~380-400px is a
+    reliable repro, especially in Editorial Mono — its tighter row
+    padding makes this the common case, not the exception), open the
+    *score* badge's popover (it's the middle control, not the last) →
+    it stays fully within the viewport, not just the location badge's
+    (which is usually last and flush against the row's right edge
+    anyway, so it's a weaker test of this).
+32. **Tap a popover's own trigger again to close it** — open a
+    popover, then click/tap the same score or location badge again →
+    it closes (same effect as tapping outside).
+33. **Popover blocks interaction with the rest of the page while open**
+    — open a popover so it overlaps another job's row, then click/tap
+    where that other row's link, badge, or status dropdown would be →
+    nothing on that other row responds (no navigation, no dropdown, no
+    focus) and the popover simply closes. This is what the scrim
+    (`.popover-scrim`) is for — verify a click there doesn't reach
+    anything beneath it (e.g. check `document.activeElement` doesn't
+    become that `<select>`).
+34. **[Linear theme] Background stays visually consistent while
+    scrolling** — on Linear Dark (the only theme with a background
+    gradient), scroll a long job list up and down → the gradient
+    doesn't visibly shift, jump, or repaint inconsistently. This one is
+    specifically about iOS Safari/Chrome's handling of fixed
+    backgrounds during scroll (`background-attachment: fixed` is
+    unreliable there); it cannot be verified in a desktop browser or
+    its mobile-viewport emulation — it needs an actual iOS device or
+    simulator.
+35. **[iOS only] Signing in doesn't leave the page zoomed in** — on a
+    real iPhone (not emulation — this is specifically about iOS's
+    auto-zoom-on-input-focus behavior), sign in from `/login` → after
+    landing on `/`, the page is at normal scale, not zoomed in on the
+    login form's former position. Also cannot be verified without real
+    iOS hardware.

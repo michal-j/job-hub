@@ -147,18 +147,42 @@ or implying they were checked.
     popovers) re-skins immediately, no partial/unstyled flash.
 22. **Theme persists across reload** — pick a theme, reload the page →
     same theme loads with no flash of the other theme's active pill
-    (this was a real bug, fixed 2026-09-20 — see `CHANGELOG.md`). This
-    was specifically re-verified on `/demo` on 2026-09-21 (picked
-    Editorial Mono, called `window.location.reload()`, confirmed both
-    `document.documentElement.getAttribute('data-theme')` and
-    `localStorage.getItem('jobHub.theme')` still read `editorial-mono`
-    afterwards) in response to a report of it reverting to Linear Dark
-    on reload with neither pill highlighted — that exact failure didn't
-    reproduce here. If it recurs, check the actual `data-theme` value at
-    that moment first (mismatched-but-present vs. genuinely missing —
-    they'd look identical but point to very different bugs), then
-    whether it's demo-mode-specific or happens on the real app's pages
-    too.
+    (this was a real bug, fixed 2026-09-20 — see `CHANGELOG.md`).
+    **A DIFFERENT failure of this case is open as of 2026-09-22, two fix
+    attempts in, neither confirmed** — reported on `/demo`, real
+    iPhone 15 Pro, Chrome, the deployed URL typed in directly (not an
+    in-app browser, not localhost — confirmed by the reporter, so both
+    of those are ruled out as factors): reload reverts to Linear Dark
+    AND neither switcher pill shows as active. That combination points
+    to `data-theme` ending up absent entirely rather than just wrong —
+    `:root`'s tokens apply unconditionally (looks like Linear Dark with
+    no attribute at all), and neither pill's exact-match selector fires
+    without a valid value either. Tried:
+    - Reordering `ThemeScript` before the font stylesheet link (in case
+      a slow font fetch delayed its execution) — retested on device,
+      did not fix it.
+    - A blocking CSP was the next suspect (would produce exactly this
+      symptom, and wouldn't show up locally if only added for
+      production) — ruled out, there's no CSP anywhere in this codebase.
+    - `useTheme` now self-heals on mount if `data-theme` is missing or
+      invalid, re-applying the saved preference to the DOM attribute
+      itself rather than only reading it into React state — added
+      2026-09-22, **not yet confirmed** (still never reproduced locally
+      to test against, even after two attempts).
+
+    Local testing (Chrome desktop + mobile-viewport emulation, real
+    `window.location.reload()`, checking `data-theme` and
+    `localStorage.getItem('jobHub.theme')` directly) has never once
+    reproduced a failure here, in any of these attempts. If you're
+    picking this up: the reporter has said plainly they don't want to
+    do more diagnostic legwork for this (no remote inspector, no
+    testing other browsers/devices — it just needs to work on their
+    one real setup), so don't ask for more of that. The self-heal fix
+    is the best remaining move without new information; if it doesn't
+    hold, the next thing worth trying is probably a visible on-page
+    readout of `data-theme`/`localStorage` state (so the fact of it
+    happening is self-reporting, nothing to go dig for) rather than
+    another blind guess at the mechanism.
 23. **Theme is independent per browser** — the login page always renders
     its own neutral palette regardless of the last picked theme.
 
@@ -208,14 +232,24 @@ Use the browser's device toolbar (or resize the window) at roughly:
 32. **Tap a popover's own trigger again to close it** — open a
     popover, then click/tap the same score or location badge again →
     it closes (same effect as tapping outside).
-33. **Popover blocks interaction with the rest of the page while open**
-    — open a popover so it overlaps another job's row, then click/tap
-    where that other row's link, badge, or status dropdown would be →
-    nothing on that other row responds (no navigation, no dropdown, no
-    focus) and the popover simply closes. This is what the scrim
-    (`.popover-scrim`) is for — verify a click there doesn't reach
-    anything beneath it (e.g. check `document.activeElement` doesn't
-    become that `<select>`).
+33. **Popover blocks interaction with the rest of the page while open —
+    partially, by design for now.** Open a popover, then click/tap a
+    job link underneath it → blocked, the popover just closes
+    (`.popover-scrim`, a full-viewport element that catches the tap via
+    z-index — check `document.elementFromPoint(x, y)` at the link's
+    coordinates returns the scrim, not the link). **Status dropdowns
+    and filter pills are NOT blocked** — confirmed on real iPhone 15
+    Pro testing 2026-09-22, and left that way deliberately: a follow-up
+    fix (`pointer-events: none` on the whole list via a shared
+    `PopoverLock` context, independent of the scrim's z-index) closed
+    that gap in every test run here, but froze the real app on
+    sign-in/sign-out against actual Supabase data and, per the same
+    report, regressed even the scrim's own link-blocking — reverted
+    2026-09-22 rather than debug blind against data this can't be
+    tested against locally (see `HANDOFF.md` and `CHANGELOG.md`). If
+    you revisit this: reproduce it against the *real* authenticated
+    app first (not `/demo`) before trusting any fix, since that's
+    exactly what this gap needs and what wasn't available last time.
 34. **[Linear theme] Background stays visually consistent while
     scrolling** — on Linear Dark (the only theme with a background
     gradient), scroll a long job list up and down → the gradient

@@ -38,10 +38,18 @@ project deploys straight from `main` with no version numbers, so
 - Tapping an open popover's own trigger again now closes it, the same
   as tapping anywhere else outside it — previously tapping it again just
   re-opened it with no way to dismiss without tapping elsewhere first.
-- While a popover is open, the rest of the page (job links, other
-  badges, the status dropdown) is no longer reachable underneath it — a
-  transparent scrim now catches those taps and closes the popover
-  instead of letting them accidentally trigger whatever was underneath.
+- While a popover is open, job links underneath it are no longer
+  reachable — a transparent scrim now catches those taps and closes the
+  popover instead of letting them navigate. **Confirmed partial on real
+  iPhone 15 Pro testing: this blocks job links but not status dropdowns
+  or filter pills** — a follow-up attempt to close that gap (a shared
+  `pointer-events: none` lock on the whole list, independent of the
+  scrim's z-index) froze the real app on sign-in/sign-out against actual
+  Supabase data and, per the same report, stopped blocking anything at
+  all — reverted (see the "Unreleased" note below and `TEST_CASES.md`
+  case 33). Left as scrim-only for now, matching what was explicitly
+  OK'd rather than risk another regression against data this can't be
+  tested against locally.
 - [Linear theme] The page background could shift or repaint
   inconsistently while scrolling on iOS Safari/Chrome —
   `background-attachment: fixed` (used to keep the gradient consistent
@@ -59,10 +67,25 @@ project deploys straight from `main` with no version numbers, so
   `<head>` instead of after — a classic `<script>` following a pending
   `<link rel="stylesheet">` has its execution deferred until that
   stylesheet loads, which could delay setting `data-theme` on a slow
-  connection. Not confirmed as the cause of a report that the demo page
-  reverted to the default theme on reload (not reproducible locally —
-  the mechanism otherwise checked out), but a legitimate hardening fix
-  regardless.
+  connection. **Confirmed on real-device retest that this did NOT fix**
+  the demo-mode theme-persistence report (see next entry for the
+  follow-up attempt). Stays as a legitimate hardening fix on its own
+  merits regardless.
+
+### Fixed (attempt 2)
+
+- `useTheme` now self-heals if `data-theme` is ever missing or invalid
+  when it mounts, instead of only reading it — re-applying the saved
+  `localStorage` preference (or the default) to the DOM attribute
+  itself, not just to React state. `ThemeScript` should always set a
+  valid value before this ever runs, so landing in this branch means
+  something upstream of it failed; this targets the *symptom* (neither
+  theme actually applied, neither switcher pill lit up — the two report
+  independently, and both are explained by the attribute being absent
+  entirely, since the base tokens are declared on `:root` unconditionally
+  too) rather than a specific unconfirmed cause. **Not yet confirmed
+  fixed** — still unreproduced locally after two attempts; see
+  `TEST_CASES.md` case 22 for what's been ruled out.
 
 ### Added
 

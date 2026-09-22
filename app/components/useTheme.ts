@@ -23,7 +23,29 @@ export function useTheme() {
 
   useIsomorphicLayoutEffect(() => {
     const current = document.documentElement.getAttribute("data-theme");
-    if (isTheme(current)) setThemeState(current);
+    if (isTheme(current)) {
+      setThemeState(current);
+      return;
+    }
+
+    // ThemeScript (in <head>, runs before hydration) always sets this to
+    // something valid — landing here means it didn't run, or something
+    // cleared it before this effect did. Reported once as: page renders
+    // like Linear Dark (the :root default, which is what you get with no
+    // attribute at all) but *neither* switcher pill highlights (both
+    // pills key off the exact attribute value, so a missing/invalid one
+    // matches neither). Root cause unconfirmed — self-heal from
+    // localStorage here instead of leaving that inconsistent state up,
+    // whatever caused it.
+    try {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      const theme = isTheme(saved) ? saved : DEFAULT_THEME;
+      document.documentElement.setAttribute("data-theme", theme);
+      setThemeState(theme);
+    } catch {
+      document.documentElement.setAttribute("data-theme", DEFAULT_THEME);
+      setThemeState(DEFAULT_THEME);
+    }
   }, []);
 
   function setTheme(next: Theme) {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { usePopoverLock } from "./PopoverLock";
 
 // Estimate is intentionally generous — better to flip slightly too eagerly
 // than to render a popup that gets clipped by the viewport edge.
@@ -20,6 +21,7 @@ export function usePopupDirection() {
   const triggerRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState<PopupPlacement>({ direction: "down", left: 0 });
+  const { setLocked } = usePopoverLock();
 
   // maxWidth must match the CSS class's own width cap (320 for
   // .popover-anchor, 300 for .popover-anchor.narrow) — it's only used
@@ -52,13 +54,21 @@ export function usePopupDirection() {
     return { direction, left: clampedLeft - rect.left };
   }
 
+  // setLocked is set atomically alongside setOpen (not in a useEffect
+  // reacting to `open`) so there's no ordering ambiguity between "badge A
+  // closing" and "badge B opening" when one tap causes both. Scoped to
+  // this row's own PopoverLockProvider (see JobList) — only the 3
+  // components in this one job-actions row ever re-render from it, not
+  // the whole list, however many jobs there are.
   function openPopover(maxWidth: number) {
     setPlacement(measure(maxWidth));
     setOpen(true);
+    setLocked(true);
   }
 
   function closePopover() {
     setOpen(false);
+    setLocked(false);
   }
 
   // Touch devices have no hover, so the trigger itself has to double as
@@ -84,6 +94,7 @@ export function usePopupDirection() {
     function handleOutside(e: MouseEvent | TouchEvent) {
       if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) {
         setOpen(false);
+        setLocked(false);
       }
     }
 
@@ -93,7 +104,18 @@ export function usePopupDirection() {
       document.removeEventListener("mousedown", handleOutside);
       document.removeEventListener("touchstart", handleOutside);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  // If this instance unmounts while its own popover was open (e.g. a
+  // filter change removes the job from the list), release the row's
+  // lock — otherwise that row's other controls would stay permanently
+  // uninteractive. Safe unconditionally: only one badge per row can be
+  // open at a time, so this is a no-op for whichever one wasn't holding it.
+  useEffect(() => {
+    return () => setLocked(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { triggerRef, open, placement, openPopover, closePopover, togglePopover };
 }

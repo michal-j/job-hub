@@ -100,7 +100,17 @@ export function CompatibilityBadge({
       {open && <div className="popover-scrim" />}
       <div
         ref={triggerRef}
-        style={{ position: "relative", display: "inline-block", zIndex: open ? 16 : "auto" }}
+        style={{
+          position: "relative",
+          display: "inline-block",
+          zIndex: open ? 16 : "auto",
+          // The row's job-actions gets pointer-events:none while any
+          // badge in it is open (see JobList/PopoverLock) — this
+          // specific trigger (and its own popover, nested inside it)
+          // needs to opt back in, or it'd be unable to close/re-toggle
+          // itself.
+          pointerEvents: open ? "auto" : undefined,
+        }}
         onPointerEnter={(e) => {
           if (e.pointerType === "mouse") openPopover(POPOVER_MAX_WIDTH);
         }}

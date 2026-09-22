@@ -38,18 +38,31 @@ project deploys straight from `main` with no version numbers, so
 - Tapping an open popover's own trigger again now closes it, the same
   as tapping anywhere else outside it — previously tapping it again just
   re-opened it with no way to dismiss without tapping elsewhere first.
-- While a popover is open, job links underneath it are no longer
-  reachable — a transparent scrim now catches those taps and closes the
-  popover instead of letting them navigate. **Confirmed partial on real
-  iPhone 15 Pro testing: this blocks job links but not status dropdowns
-  or filter pills** — a follow-up attempt to close that gap (a shared
-  `pointer-events: none` lock on the whole list, independent of the
-  scrim's z-index) froze the real app on sign-in/sign-out against actual
-  Supabase data and, per the same report, stopped blocking anything at
-  all — reverted (see the "Unreleased" note below and `TEST_CASES.md`
-  case 33). Left as scrim-only for now, matching what was explicitly
-  OK'd rather than risk another regression against data this can't be
-  tested against locally.
+- While a popover is open, the rest of the page is no longer reachable
+  underneath it — confirmed fixed 2026-09-22, on an iOS Simulator this
+  time, not just Chrome. This took three attempts to get right:
+  1. A transparent scrim (blocks via z-index) — shipped first, and
+     testing showed it blocked job links on other rows but not a row's
+     own status select or its other badge.
+  2. A `pointer-events: none` lock shared across the *entire* job list —
+     closed that gap in every test here, but froze the real app on
+     sign-in/sign-out against actual Supabase data (almost certainly
+     the re-render cost of one shared lock touched by every badge
+     across every row, all re-rendering on every open/close) and, per
+     the same report, regressed even the scrim's own link-blocking.
+     Reverted.
+  3. The same `pointer-events: none` idea, but scoped to **one row's**
+     own `PopoverLockProvider` instead of the whole list — same fix,
+     bounded blast radius (3 components per toggle,
+     regardless of how many jobs are in the list). Verified this time
+     on a real iOS Simulator (not just reasoned about): a row's own
+     status select and its other badge are genuinely unreachable
+     (checked via `elementFromPoint` and `getComputedStyle`, not just a
+     visual check) while a popover in that row is open, cross-row
+     blocking (attempt 1's win) still holds, and 20+ rapid open/close
+     cycles produced no freeze. See `TEST_CASES.md` case 33 for the
+     full detail and what's still not covered (switching between a
+     row's two badges is deliberately allowed, not blocked).
 - [Linear theme] The page background could shift or repaint
   inconsistently while scrolling on iOS Safari/Chrome —
   `background-attachment: fixed` (used to keep the gradient consistent
@@ -60,32 +73,18 @@ project deploys straight from `main` with no version numbers, so
   iOS auto-zooms the page on focus, and because signing in navigates
   away without a full page reload, the zoomed-in scale was never being
   reset afterwards, leaving the whole app zoomed in on first load.
-
-### Changed
-
-- `ThemeScript` now runs before the Google Fonts stylesheet link in
-  `<head>` instead of after — a classic `<script>` following a pending
-  `<link rel="stylesheet">` has its execution deferred until that
-  stylesheet loads, which could delay setting `data-theme` on a slow
-  connection. **Confirmed on real-device retest that this did NOT fix**
-  the demo-mode theme-persistence report (see next entry for the
-  follow-up attempt). Stays as a legitimate hardening fix on its own
-  merits regardless.
-
-### Fixed (attempt 2)
-
-- `useTheme` now self-heals if `data-theme` is ever missing or invalid
+- Demo-mode reload reverting to Linear Dark with neither switcher pill
+  active (a different bug from the one fixed 2026-09-20 above) —
+  **confirmed fixed 2026-09-22** by the reporter, on the second attempt:
+  `useTheme` now self-heals if `data-theme` is ever missing or invalid
   when it mounts, instead of only reading it — re-applying the saved
   `localStorage` preference (or the default) to the DOM attribute
-  itself, not just to React state. `ThemeScript` should always set a
-  valid value before this ever runs, so landing in this branch means
-  something upstream of it failed; this targets the *symptom* (neither
-  theme actually applied, neither switcher pill lit up — the two report
-  independently, and both are explained by the attribute being absent
-  entirely, since the base tokens are declared on `:root` unconditionally
-  too) rather than a specific unconfirmed cause. **Not yet confirmed
-  fixed** — still unreproduced locally after two attempts; see
-  `TEST_CASES.md` case 22 for what's been ruled out.
+  itself, not just to React state. (The first attempt, reordering
+  `ThemeScript` before the font stylesheet link in case a slow font
+  fetch was delaying its execution, didn't fix it, but stays in as a
+  legitimate hardening change on its own merits.) Neither attempt was
+  ever reproducible locally, only on the reporter's real device — see
+  `TEST_CASES.md` case 22.
 
 ### Added
 
@@ -95,6 +94,10 @@ project deploys straight from `main` with no version numbers, so
 - `TEST_CASES.md` — human-readable test cases for both the automated
   suite and the flows that need a live session/browser to exercise.
 - This changelog.
+- `app/components/PopoverLock.tsx` — a small context, instantiated once
+  per job row, giving that row's `CompatibilityBadge`/`LocationBadge`/
+  `StatusSelect` a shared "is either badge in this row open" flag to
+  drive the `pointer-events: none` lock described above.
 
 ## 2026-09-20
 

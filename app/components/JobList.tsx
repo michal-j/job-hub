@@ -5,6 +5,7 @@ import { StatusSelect } from "./StatusSelect";
 import { CompatibilityBadge } from "./CompatibilityBadge";
 import { LocationBadge } from "./LocationBadge";
 import { statusColorVar } from "./statusStyles";
+import { PopoverLockProvider, usePopoverLock } from "./PopoverLock";
 import { loadDemoJobs, saveDemoJobs } from "@/lib/demoJobs";
 import type { JobListItem } from "@/lib/jobs";
 
@@ -63,6 +64,80 @@ function CompanyLogo({ name, logoUrl }: { name: string; logoUrl: string | null }
     .join("");
 
   return <div className="job-logo">{initials || "?"}</div>;
+}
+
+// The scrim (see CompatibilityBadge/LocationBadge) blocks other rows and
+// page chrome correctly via z-index, but real-device testing found it
+// does NOT block this row's own siblings (the status select, and
+// whichever badge isn't the one that's open) — a WebKit-specific
+// stacking quirk local to this flex container that doesn't reproduce in
+// Chrome. pointer-events:none is a second, independent guarantee that
+// doesn't depend on z-index/compositing being right on any engine.
+// Scoped to ONE row's PopoverLockProvider (not the whole list) so a
+// toggle only ever re-renders these 3 components, however many jobs are
+// in the list.
+function JobActions({
+  job,
+  onStatusChange,
+  onAnalyzed,
+  onLocationAnalyzed,
+  demoMode,
+}: {
+  job: JobListItem;
+  onStatusChange: (jobId: string, newStatus: string) => void;
+  onAnalyzed: (jobId: string, result: JobListItem["compatibility"]) => void;
+  onLocationAnalyzed: (jobId: string, result: JobListItem["locationFit"]) => void;
+  demoMode: boolean;
+}) {
+  return (
+    <PopoverLockProvider>
+      <JobActionsInner
+        job={job}
+        onStatusChange={onStatusChange}
+        onAnalyzed={onAnalyzed}
+        onLocationAnalyzed={onLocationAnalyzed}
+        demoMode={demoMode}
+      />
+    </PopoverLockProvider>
+  );
+}
+
+function JobActionsInner({
+  job,
+  onStatusChange,
+  onAnalyzed,
+  onLocationAnalyzed,
+  demoMode,
+}: {
+  job: JobListItem;
+  onStatusChange: (jobId: string, newStatus: string) => void;
+  onAnalyzed: (jobId: string, result: JobListItem["compatibility"]) => void;
+  onLocationAnalyzed: (jobId: string, result: JobListItem["locationFit"]) => void;
+  demoMode: boolean;
+}) {
+  const { locked } = usePopoverLock();
+  return (
+    <div className="job-actions" style={{ pointerEvents: locked ? "none" : undefined }}>
+      <StatusSelect
+        jobId={job.id}
+        status={job.status}
+        onChange={onStatusChange}
+        demoMode={demoMode}
+      />
+      <CompatibilityBadge
+        jobId={job.id}
+        compatibility={job.compatibility}
+        onAnalyzed={onAnalyzed}
+        demoMode={demoMode}
+      />
+      <LocationBadge
+        jobId={job.id}
+        locationFit={job.locationFit}
+        onAnalyzed={onLocationAnalyzed}
+        demoMode={demoMode}
+      />
+    </div>
+  );
 }
 
 export function JobList({
@@ -224,26 +299,13 @@ export function JobList({
                 </div>
               </div>
 
-              <div className="job-actions">
-                <StatusSelect
-                  jobId={job.id}
-                  status={job.status}
-                  onChange={handleStatusChange}
-                  demoMode={demoMode}
-                />
-                <CompatibilityBadge
-                  jobId={job.id}
-                  compatibility={job.compatibility}
-                  onAnalyzed={handleAnalyzed}
-                  demoMode={demoMode}
-                />
-                <LocationBadge
-                  jobId={job.id}
-                  locationFit={job.locationFit}
-                  onAnalyzed={handleLocationAnalyzed}
-                  demoMode={demoMode}
-                />
-              </div>
+              <JobActions
+                job={job}
+                onStatusChange={handleStatusChange}
+                onAnalyzed={handleAnalyzed}
+                onLocationAnalyzed={handleLocationAnalyzed}
+                demoMode={demoMode}
+              />
             </div>
           ))}
         </div>

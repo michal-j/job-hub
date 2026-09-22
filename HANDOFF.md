@@ -116,6 +116,47 @@ that possible without a full rewrite:
   closes it. Any new hover-triggered popover should follow the same
   pattern rather than hover-only.
 
+**WebKit-specific fixes (2026-09-22) — and why an iOS Simulator matters
+for this app specifically:** three bugs reported from a real iPhone
+never reproduced in Chrome or its mobile-viewport emulation, because
+they were genuine WebKit rendering/stacking quirks, not viewport-size
+issues:
+- The Linear theme's background gradient used
+  `background-attachment: fixed` to stay consistent across list
+  lengths — unreliable on iOS Safari/WebKit during scroll. Moved to a
+  `position: fixed` pseudo-element (`.app-shell::before`) instead, which
+  iOS handles correctly.
+- A popover's scrim (`.popover-scrim`, blocks the rest of the page via
+  z-index) turned out not to cover a row's own siblings (the status
+  select, the row's other badge) on WebKit specifically — a stacking
+  quirk local to that flex container. Fixed with a *second*,
+  independent mechanism: `pointer-events: none` applied to that row's
+  own `.job-actions` while either of its badges is open (`PopoverLock`
+  context, instantiated **once per row**, not once for the whole list —
+  a first attempt shared one lock across the entire job list and froze
+  the real app on sign-in/sign-out against actual Supabase data, almost
+  certainly from every badge in every row re-rendering on every
+  open/close; the per-row version has the same effect with a bounded,
+  3-components-per-toggle blast radius regardless of list size).
+- Login inputs were 14px; iOS auto-zooms the page on focus for text
+  inputs under 16px, and because signing in navigates away client-side
+  (no full page reload), the zoom never got a chance to reset. Bumped
+  to 16px.
+
+An Xcode + iOS Simulator became available in this environment partway
+through chasing these — **use it** (`mcp__Claude_Code_iOS_Simulator__control`)
+for anything that smells WebKit-specific rather than reasoning about it
+blind; two of the three bugs above were shipped wrong at least once
+specifically because there was no way to see the actual failure before
+that. Two gotchas learned the hard way: the control tool's tap
+coordinates are in device points, not the screenshot's pixel dimensions
+(divide screenshot pixel coordinates by the ratio reported on `attach` —
+~2.3x on the device tested here — there's no error if you get this
+wrong, taps just silently land somewhere else); and `localhost:3000` /
+`127.0.0.1:3000` are reachable directly from the Simulator's Safari,
+same as from the host Mac, so there's no need to deploy anywhere to
+test against it.
+
 ---
 
 ## 3. The single most important thing: real auth + a public demo

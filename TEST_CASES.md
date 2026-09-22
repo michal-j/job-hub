@@ -33,6 +33,26 @@ you won't have — for those, say clearly in your final report which
 specific cases you couldn't run and why, instead of silently skipping them
 or implying they were checked.
 
+**An iOS Simulator (Xcode) is available in this environment as of
+2026-09-22 — use it for anything WebKit-specific instead of guessing.**
+Several real bugs in this app (background repainting during scroll, a
+popover-blocking gap local to WebKit's stacking behavior) only reproduced
+on real iOS hardware and never in Chrome or its mobile-viewport emulation
+— fixes attempted blind against those, without a way to see the actual
+failure, shipped broken or made things worse (see `HANDOFF.md`'s fix
+history). Two things to know going in, both found the hard way in this
+same session: the `attach`/`tap`/`screenshot` control tool's tap
+coordinates are in **device points**, not the screenshot's pixel
+dimensions — divide screenshot pixel coordinates by the ratio the tool
+reports on attach (roughly 2.3x on the device tested here) before
+tapping, or every tap lands in the wrong place with no error to tell you
+so; and the app's own dev-mode error overlay ("1 error") can appear
+transiently on a fresh load tied to the dev server's HMR socket
+reconnecting — it's not necessarily a real bug, don't chase it as one
+unless it persists across a clean reload with a healthy dev server.
+localhost:3000 (or 127.0.0.1:3000) is reachable directly from the
+Simulator's Safari, same as from the host Mac.
+
 ---
 
 ## Automated
@@ -148,41 +168,14 @@ or implying they were checked.
 22. **Theme persists across reload** — pick a theme, reload the page →
     same theme loads with no flash of the other theme's active pill
     (this was a real bug, fixed 2026-09-20 — see `CHANGELOG.md`).
-    **A DIFFERENT failure of this case is open as of 2026-09-22, two fix
-    attempts in, neither confirmed** — reported on `/demo`, real
-    iPhone 15 Pro, Chrome, the deployed URL typed in directly (not an
-    in-app browser, not localhost — confirmed by the reporter, so both
-    of those are ruled out as factors): reload reverts to Linear Dark
-    AND neither switcher pill shows as active. That combination points
-    to `data-theme` ending up absent entirely rather than just wrong —
-    `:root`'s tokens apply unconditionally (looks like Linear Dark with
-    no attribute at all), and neither pill's exact-match selector fires
-    without a valid value either. Tried:
-    - Reordering `ThemeScript` before the font stylesheet link (in case
-      a slow font fetch delayed its execution) — retested on device,
-      did not fix it.
-    - A blocking CSP was the next suspect (would produce exactly this
-      symptom, and wouldn't show up locally if only added for
-      production) — ruled out, there's no CSP anywhere in this codebase.
-    - `useTheme` now self-heals on mount if `data-theme` is missing or
-      invalid, re-applying the saved preference to the DOM attribute
-      itself rather than only reading it into React state — added
-      2026-09-22, **not yet confirmed** (still never reproduced locally
-      to test against, even after two attempts).
-
-    Local testing (Chrome desktop + mobile-viewport emulation, real
-    `window.location.reload()`, checking `data-theme` and
-    `localStorage.getItem('jobHub.theme')` directly) has never once
-    reproduced a failure here, in any of these attempts. If you're
-    picking this up: the reporter has said plainly they don't want to
-    do more diagnostic legwork for this (no remote inspector, no
-    testing other browsers/devices — it just needs to work on their
-    one real setup), so don't ask for more of that. The self-heal fix
-    is the best remaining move without new information; if it doesn't
-    hold, the next thing worth trying is probably a visible on-page
-    readout of `data-theme`/`localStorage` state (so the fact of it
-    happening is self-reporting, nothing to go dig for) rather than
-    another blind guess at the mechanism.
+    A different failure of this case (reload reverting to Linear Dark
+    with neither switcher pill active, on real iPhone 15 Pro/Chrome
+    against the deployed URL) took two fix attempts — reordering
+    `ThemeScript` didn't help, but `useTheme` self-healing `data-theme`
+    on mount if it's missing/invalid (added 2026-09-22) **did** —
+    confirmed fixed by the reporter. Neither attempt was ever
+    reproducible in local/Chrome testing, only on the real device; keep
+    that in mind for any future report that looks similar.
 23. **Theme is independent per browser** — the login page always renders
     its own neutral palette regardless of the last picked theme.
 
@@ -232,36 +225,58 @@ Use the browser's device toolbar (or resize the window) at roughly:
 32. **Tap a popover's own trigger again to close it** — open a
     popover, then click/tap the same score or location badge again →
     it closes (same effect as tapping outside).
-33. **Popover blocks interaction with the rest of the page while open —
-    partially, by design for now.** Open a popover, then click/tap a
-    job link underneath it → blocked, the popover just closes
-    (`.popover-scrim`, a full-viewport element that catches the tap via
-    z-index — check `document.elementFromPoint(x, y)` at the link's
-    coordinates returns the scrim, not the link). **Status dropdowns
-    and filter pills are NOT blocked** — confirmed on real iPhone 15
-    Pro testing 2026-09-22, and left that way deliberately: a follow-up
-    fix (`pointer-events: none` on the whole list via a shared
-    `PopoverLock` context, independent of the scrim's z-index) closed
-    that gap in every test run here, but froze the real app on
-    sign-in/sign-out against actual Supabase data and, per the same
-    report, regressed even the scrim's own link-blocking — reverted
-    2026-09-22 rather than debug blind against data this can't be
-    tested against locally (see `HANDOFF.md` and `CHANGELOG.md`). If
-    you revisit this: reproduce it against the *real* authenticated
-    app first (not `/demo`) before trusting any fix, since that's
-    exactly what this gap needs and what wasn't available last time.
+33. **Popover blocks interaction with the rest of the page while open.**
+    Two things to check, both confirmed on a real iOS Simulator
+    (iPhone 17 Pro, WebKit) as of 2026-09-22 — see `HANDOFF.md` for the
+    fix history and why Simulator testing (not just Chrome) is what
+    finally nailed this one down:
+    - **Cross-row**: open a popover, tap a *different* row's job link
+      or another row's badge → blocked, the tap just closes the
+      popover (`.popover-scrim`, a full-viewport element catching the
+      tap via z-index — `document.elementFromPoint(x, y)` at the
+      target's coordinates should return the scrim, not the target).
+      This part always worked, even before the fix below.
+    - **Same-row**: open a popover, tap *that row's own* status select
+      or its other badge → also blocked now (previously the real bug:
+      the scrim's z-index approach doesn't cover a row's own siblings
+      on WebKit specifically, a stacking quirk that never reproduced in
+      Chrome). Fixed via `pointer-events: none` applied to just that
+      row's `.job-actions` (a `PopoverLock` context scoped **per row**,
+      not to the whole list — check `getComputedStyle(el).pointerEvents`
+      is `"none"` on the row's select while open, `"auto"` again once
+      closed). A first attempt scoped this lock to the *entire list*
+      instead of one row — that closed the gap in every test here too,
+      but froze the real app on sign-in/sign-out against actual
+      Supabase data (almost certainly the re-render cost of one shared
+      lock touched by every badge across every row, all re-rendering on
+      every open/close) and was reverted. The per-row version has the
+      same UI effect with a tiny, bounded blast radius — 3 components
+      per toggle, however many jobs are in the list — so that failure
+      mode shouldn't recur, but this hasn't been tested against a real
+      large dataset or the authenticated app, only `/demo`'s 33 jobs.
+    - Switching between a row's two badges (tapping the *other* AI
+      badge while one is open, rather than the select) is intentionally
+      not blocked — treated as a valid "switch" action, not something
+      to prevent.
 34. **[Linear theme] Background stays visually consistent while
     scrolling** — on Linear Dark (the only theme with a background
-    gradient), scroll a long job list up and down → the gradient
-    doesn't visibly shift, jump, or repaint inconsistently. This one is
-    specifically about iOS Safari/Chrome's handling of fixed
+    gradient), scroll a long job list (the "All" filter, 33 jobs) up
+    and down → the gradient doesn't visibly shift, jump, or repaint
+    inconsistently. This is about iOS Safari/Chrome's handling of fixed
     backgrounds during scroll (`background-attachment: fixed` is
-    unreliable there); it cannot be verified in a desktop browser or
-    its mobile-viewport emulation — it needs an actual iOS device or
-    simulator.
+    unreliable there); a desktop browser or its mobile-viewport
+    emulation can't reproduce the underlying bug. Checked on an iOS
+    Simulator (iPhone 17 Pro) 2026-09-22 — before/after screenshots
+    across a full scroll cycle showed no visible shift — but a
+    mid-scroll repaint glitch is inherently a live, transient artifact;
+    static screenshots can miss one even where it exists. Watch for a
+    live repro (not just screenshots) if this regresses.
 35. **[iOS only] Signing in doesn't leave the page zoomed in** — on a
-    real iPhone (not emulation — this is specifically about iOS's
-    auto-zoom-on-input-focus behavior), sign in from `/login` → after
-    landing on `/`, the page is at normal scale, not zoomed in on the
-    login form's former position. Also cannot be verified without real
-    iOS hardware.
+    real iPhone (or the Simulator, now that it's set up — this is
+    specifically about iOS's auto-zoom-on-input-focus behavior), sign
+    in from `/login` → after landing on `/`, the page is at normal
+    scale, not zoomed in on the login form's former position. Not
+    checked on the Simulator yet — needs a real Supabase session, which
+    this environment doesn't have credentials for; the fix (16px login
+    inputs, avoiding iOS's sub-16px auto-zoom trigger) is a standard,
+    well-known one, but this exact flow is still unverified end-to-end.

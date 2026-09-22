@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { usePopoverLock } from "./PopoverLock";
 
 // Estimate is intentionally generous — better to flip slightly too eagerly
 // than to render a popup that gets clipped by the viewport edge.
@@ -21,7 +20,6 @@ export function usePopupDirection() {
   const triggerRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState<PopupPlacement>({ direction: "down", left: 0 });
-  const { setLocked } = usePopoverLock();
 
   // maxWidth must match the CSS class's own width cap (320 for
   // .popover-anchor, 300 for .popover-anchor.narrow) — it's only used
@@ -54,22 +52,13 @@ export function usePopupDirection() {
     return { direction, left: clampedLeft - rect.left };
   }
 
-  // setLocked is set atomically alongside setOpen (not in a useEffect
-  // reacting to `open`) so there's no ordering ambiguity between "badge A
-  // closing" and "badge B opening" when one tap causes both — the scrim
-  // already blocks the rest of the page via z-index, but that depends on
-  // stacking/compositing being right on every browser engine;
-  // pointer-events:none (which JobList applies while locked) doesn't
-  // depend on that at all, so this is a second, independent guarantee.
   function openPopover(maxWidth: number) {
     setPlacement(measure(maxWidth));
     setOpen(true);
-    setLocked(true);
   }
 
   function closePopover() {
     setOpen(false);
-    setLocked(false);
   }
 
   // Touch devices have no hover, so the trigger itself has to double as
@@ -95,7 +84,6 @@ export function usePopupDirection() {
     function handleOutside(e: MouseEvent | TouchEvent) {
       if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) {
         setOpen(false);
-        setLocked(false);
       }
     }
 
@@ -105,18 +93,7 @@ export function usePopupDirection() {
       document.removeEventListener("mousedown", handleOutside);
       document.removeEventListener("touchstart", handleOutside);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
-
-  // If this instance unmounts while its own popover was open (e.g. a
-  // filter change removes the job from the list), release the lock —
-  // otherwise the rest of the page would stay permanently uninteractive.
-  // Safe to call unconditionally: at most one popover is ever open, so
-  // this is a no-op for every instance that wasn't holding it.
-  useEffect(() => {
-    return () => setLocked(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return { triggerRef, open, placement, openPopover, closePopover, togglePopover };
 }

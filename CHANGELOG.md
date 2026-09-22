@@ -39,20 +39,9 @@ project deploys straight from `main` with no version numbers, so
   as tapping anywhere else outside it — previously tapping it again just
   re-opened it with no way to dismiss without tapping elsewhere first.
 - While a popover is open, the rest of the page (job links, other
-  badges, the status dropdown, the status/source filters) is no longer
-  reachable underneath it. A transparent scrim (blocking via z-index)
-  was the first attempt, and real-device testing on iPhone 15 Pro
-  confirmed it stops job links but not status dropdowns or filter pills
-  — plausibly a WebKit-specific stacking/compositing quirk that doesn't
-  reproduce in Chrome, where the scrim alone tested as fully working.
-  Rather than chase that blind, added a second, independent mechanism
-  that doesn't depend on z-index or compositing at all: `JobList` now
-  sets `pointer-events: none` on the whole list + filters while any
-  popover is open (`PopoverLock` context), with just the open badge's
-  own trigger and the scrim itself opted back in via `pointer-events:
-  auto`. Verified via real hit-testing (`elementFromPoint`, not just
-  dispatching events straight at elements) that filter pills and other
-  rows' status selects are unreachable while a popover is open.
+  badges, the status dropdown) is no longer reachable underneath it — a
+  transparent scrim now catches those taps and closes the popover
+  instead of letting them accidentally trigger whatever was underneath.
 - [Linear theme] The page background could shift or repaint
   inconsistently while scrolling on iOS Safari/Chrome —
   `background-attachment: fixed` (used to keep the gradient consistent
@@ -70,12 +59,10 @@ project deploys straight from `main` with no version numbers, so
   `<head>` instead of after — a classic `<script>` following a pending
   `<link rel="stylesheet">` has its execution deferred until that
   stylesheet loads, which could delay setting `data-theme` on a slow
-  connection. **Confirmed on real-device retest that this did NOT fix**
-  the report that the demo page reverts to Linear Dark on reload with
-  neither switcher pill highlighted — still unreproduced locally (see
-  `TEST_CASES.md` case 22), still open. This change stays as a
-  legitimate hardening fix on its own merits, just not a fix for that
-  report.
+  connection. Not confirmed as the cause of a report that the demo page
+  reverted to the default theme on reload (not reproducible locally —
+  the mechanism otherwise checked out), but a legitimate hardening fix
+  regardless.
 
 ### Added
 
@@ -85,10 +72,6 @@ project deploys straight from `main` with no version numbers, so
 - `TEST_CASES.md` — human-readable test cases for both the automated
   suite and the flows that need a live session/browser to exercise.
 - This changelog.
-- `app/components/PopoverLock.tsx` — a small context shared by every
-  `CompatibilityBadge`/`LocationBadge` instance via `usePopupDirection`,
-  giving `JobList` a single "is any popover open right now" flag to
-  drive the `pointer-events: none` lock described above.
 
 ## 2026-09-20
 

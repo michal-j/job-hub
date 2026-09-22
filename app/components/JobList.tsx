@@ -5,7 +5,6 @@ import { StatusSelect } from "./StatusSelect";
 import { CompatibilityBadge } from "./CompatibilityBadge";
 import { LocationBadge } from "./LocationBadge";
 import { statusColorVar } from "./statusStyles";
-import { PopoverLockProvider, usePopoverLock } from "./PopoverLock";
 import { loadDemoJobs, saveDemoJobs } from "@/lib/demoJobs";
 import type { JobListItem } from "@/lib/jobs";
 
@@ -66,22 +65,13 @@ function CompanyLogo({ name, logoUrl }: { name: string; logoUrl: string | null }
   return <div className="job-logo">{initials || "?"}</div>;
 }
 
-export function JobList(props: { initialJobs: JobListItem[]; demoMode?: boolean }) {
-  return (
-    <PopoverLockProvider>
-      <JobListInner {...props} />
-    </PopoverLockProvider>
-  );
-}
-
-function JobListInner({
+export function JobList({
   initialJobs,
   demoMode = false,
 }: {
   initialJobs: JobListItem[];
   demoMode?: boolean;
 }) {
-  const { locked } = usePopoverLock();
   const [jobs, setJobs] = useState(initialJobs);
   const [filter, setFilter] = useState("new");
   const [sourceFilter, setSourceFilter] = useState("all");
@@ -138,7 +128,7 @@ function JobListInner({
   }
 
   return (
-    <div style={{ pointerEvents: locked ? "none" : undefined }}>
+    <div>
       <div className="filters">
         {FILTER_OPTIONS.map((opt) => (
           <button

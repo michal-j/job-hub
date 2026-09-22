@@ -904,12 +904,6 @@ a {
   position: fixed;
   inset: 0;
   z-index: 15;
-  /* Explicit, not relying on the default — JobList also sets
-     pointer-events:none on everything else while a popover is open (a
-     second, independent way of blocking interaction that doesn't depend
-     on z-index/stacking being correct), and this element is a descendant
-     of that same subtree, so it would otherwise inherit "none" too. */
-  pointer-events: auto;
   background: transparent;
 }
 

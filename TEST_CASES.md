@@ -147,18 +147,49 @@ or implying they were checked.
     popovers) re-skins immediately, no partial/unstyled flash.
 22. **Theme persists across reload** — pick a theme, reload the page →
     same theme loads with no flash of the other theme's active pill
-    (this was a real bug, fixed 2026-09-20 — see `CHANGELOG.md`). This
-    was specifically re-verified on `/demo` on 2026-09-21 (picked
-    Editorial Mono, called `window.location.reload()`, confirmed both
-    `document.documentElement.getAttribute('data-theme')` and
-    `localStorage.getItem('jobHub.theme')` still read `editorial-mono`
-    afterwards) in response to a report of it reverting to Linear Dark
-    on reload with neither pill highlighted — that exact failure didn't
-    reproduce here. If it recurs, check the actual `data-theme` value at
-    that moment first (mismatched-but-present vs. genuinely missing —
-    they'd look identical but point to very different bugs), then
-    whether it's demo-mode-specific or happens on the real app's pages
-    too.
+    (this was a real bug, fixed 2026-09-20 — see `CHANGELOG.md`).
+    **Status: a DIFFERENT failure of this same case is open and
+    unresolved as of 2026-09-22**, reported twice on a real iPhone 15
+    Pro against `/demo`: reload reverts to Linear Dark instead of the
+    picked theme, AND neither switcher pill shows as active. That
+    second symptom is the important clue — `ThemeScript`'s fallback
+    path always sets `data-theme="linear-dark"` explicitly (never
+    leaves it unset), and if it had, the Linear pill (which is keyed off
+    `[data-theme="linear-dark"]`, not React state) would still be
+    highlighted. Neither pill lighting up means `data-theme` is neither
+    `linear-dark` nor `editorial-mono` — most likely **absent
+    entirely**, which also explains the "looks like Linear" half: the
+    base tokens are declared on `:root, [data-theme="linear-dark"]`
+    together, so plain `:root` alone (no attribute at all) renders
+    identically to Linear Dark without matching either pill's selector.
+    Two fix attempts, two dead ends:
+    - Reordering `ThemeScript` before the font stylesheet link (in case
+      a slow font fetch was delaying its execution) — retested on
+      device, did not fix it.
+    - A Content-Security-Policy blocking the inline script was the next
+      suspect (would produce exactly this "attribute never gets set at
+      all" symptom, and wouldn't reproduce on `localhost` if the CSP is
+      only added for production) — ruled out, there's no CSP anywhere
+      in this codebase (`next.config.mjs` has no `headers()`, no CSP in
+      `vercel.json` or `middleware.ts`).
+    - Repeated local testing (Chrome desktop + mobile-viewport
+      emulation, real `window.location.reload()`, checking both the
+      `data-theme` DOM attribute and `localStorage.getItem('jobHub.theme')`
+      directly) has never reproduced any failure — the mechanism
+      checks out every time here.
+
+    If you're picking this up: the open question is what's different
+    about the real-device environment. Useful things to get from the
+    person who can reproduce it, before trying another blind fix:
+    localhost or the deployed Vercel URL; real Safari/Chrome or an
+    in-app browser (opened via a link from Messages/Slack/etc. — some
+    of those use a WKWebView with different, sometimes ephemeral,
+    storage behavior than the real browser); and, if at all possible,
+    the actual value of `document.documentElement.getAttribute('data-theme')`
+    read right after the bug occurs (via Safari's remote Web Inspector
+    if they have a Mac to pair with) — that would confirm or kill the
+    "attribute is absent" theory outright instead of adding a third
+    guess.
 23. **Theme is independent per browser** — the login page always renders
     its own neutral palette regardless of the last picked theme.
 
@@ -209,13 +240,30 @@ Use the browser's device toolbar (or resize the window) at roughly:
     popover, then click/tap the same score or location badge again →
     it closes (same effect as tapping outside).
 33. **Popover blocks interaction with the rest of the page while open**
-    — open a popover so it overlaps another job's row, then click/tap
-    where that other row's link, badge, or status dropdown would be →
-    nothing on that other row responds (no navigation, no dropdown, no
-    focus) and the popover simply closes. This is what the scrim
-    (`.popover-scrim`) is for — verify a click there doesn't reach
-    anything beneath it (e.g. check `document.activeElement` doesn't
-    become that `<select>`).
+    — open a popover, then click/tap a status dropdown (same row or a
+    different one), a filter/source pill, or a job link → none of them
+    respond (no dropdown, no filter change, no navigation, no focus)
+    and the click just closes the popover. Verify this two ways, not
+    just one:
+    - via real hit-testing (`document.elementFromPoint(x, y)` at the
+      target's coordinates should return `.popover-scrim`, not the
+      target) — dispatching an event directly on the target element
+      bypasses `pointer-events` entirely and will falsely pass;
+    - via `getComputedStyle(el).pointerEvents === "none"` on the
+      filters/job-list while a popover is open, and `"auto"` again once
+      it closes.
+
+    Two independent mechanisms are involved: a full-viewport scrim
+    (`.popover-scrim`, blocks via z-index — confirmed working for job
+    links, but a real-device (iPhone 15 Pro) test found status dropdowns
+    and filter pills still reachable through it, a WebKit-specific
+    stacking/compositing quirk that doesn't reproduce in Chrome) and
+    `pointer-events: none` applied to the whole list + filters via the
+    `PopoverLock` context (`app/components/PopoverLock.tsx`), which
+    doesn't depend on z-index/compositing at all. If this regresses
+    again, suspect the scrim-only path first and check whether the
+    `pointer-events` lock is actually engaging (the computed-style check
+    above) before assuming the whole mechanism is broken.
 34. **[Linear theme] Background stays visually consistent while
     scrolling** — on Linear Dark (the only theme with a background
     gradient), scroll a long job list up and down → the gradient

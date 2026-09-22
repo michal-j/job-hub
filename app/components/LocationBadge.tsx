@@ -92,7 +92,16 @@ export function LocationBadge({
       {open && <div className="popover-scrim" />}
       <div
         ref={triggerRef}
-        style={{ position: "relative", display: "inline-block", zIndex: open ? 16 : "auto" }}
+        style={{
+          position: "relative",
+          display: "inline-block",
+          zIndex: open ? 16 : "auto",
+          // JobList sets pointer-events:none on everything while any
+          // popover is open — this specific trigger (and its own
+          // popover, nested inside it) needs to opt back in, or it'd be
+          // unable to close/re-toggle itself.
+          pointerEvents: open ? "auto" : undefined,
+        }}
         onPointerEnter={(e) => {
           if (e.pointerType === "mouse") openPopover(POPOVER_MAX_WIDTH);
         }}

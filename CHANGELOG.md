@@ -38,31 +38,52 @@ project deploys straight from `main` with no version numbers, so
 - Tapping an open popover's own trigger again now closes it, the same
   as tapping anywhere else outside it — previously tapping it again just
   re-opened it with no way to dismiss without tapping elsewhere first.
-- While a popover is open, the rest of the page is no longer reachable
-  underneath it — confirmed fixed 2026-09-22, on an iOS Simulator this
-  time, not just Chrome. This took three attempts to get right:
-  1. A transparent scrim (blocks via z-index) — shipped first, and
-     testing showed it blocked job links on other rows but not a row's
-     own status select or its other badge.
+- While a popover is open, the rest of the page should not be reachable
+  underneath it. **Status: fourth attempt, NOT yet confirmed by the
+  reporter — do not mark this fixed again without that confirmation.**
+  History, because it's long and the pattern matters for whoever
+  continues it:
+  1. A transparent scrim (blocks via z-index) — shipped first. Testing
+     (real iPhone 15 Pro) found it blocked job links on other rows but
+     not a row's own status select or its other badge.
   2. A `pointer-events: none` lock shared across the *entire* job list —
-     closed that gap in every test here, but froze the real app on
+     closed that gap in every test run here, but froze the real app on
      sign-in/sign-out against actual Supabase data (almost certainly
      the re-render cost of one shared lock touched by every badge
      across every row, all re-rendering on every open/close) and, per
      the same report, regressed even the scrim's own link-blocking.
      Reverted.
-  3. The same `pointer-events: none` idea, but scoped to **one row's**
-     own `PopoverLockProvider` instead of the whole list — same fix,
-     bounded blast radius (3 components per toggle,
-     regardless of how many jobs are in the list). Verified this time
-     on a real iOS Simulator (not just reasoned about): a row's own
-     status select and its other badge are genuinely unreachable
-     (checked via `elementFromPoint` and `getComputedStyle`, not just a
-     visual check) while a popover in that row is open, cross-row
-     blocking (attempt 1's win) still holds, and 20+ rapid open/close
-     cycles produced no freeze. See `TEST_CASES.md` case 33 for the
-     full detail and what's still not covered (switching between a
-     row's two badges is deliberately allowed, not blocked).
+  3. The same `pointer-events: none` idea, scoped to **one row's**
+     `PopoverLockProvider` instead of the whole list. Verified on a real
+     iOS Simulator via `elementFromPoint`/`getComputedStyle` (not just a
+     visual check): a row's own status select and its other badge were
+     genuinely unreachable, cross-row blocking held, 20+ open/close
+     cycles produced no freeze. **Reported back as still broken on real
+     Chrome iOS anyway** — specifically, filter pills (nowhere near a
+     job row, no relationship to this row-scoped fix at all) were still
+     tappable, meaning the *scrim* itself doesn't work reliably on
+     Chrome iOS, a bigger problem than the row-scoped gap this attempt
+     targeted.
+  4. Replaced the per-row Context with a single `body.popover-open`
+     class (see `usePopupDirection`, `globals.css`) making
+     `.main-container` — filters and the whole job list together, not
+     just one row — `pointer-events: none` while any popover anywhere
+     is open, with only the open trigger opting back in. No React
+     Context, no state shared across components, so the freeze cause
+     from attempt 2 can't recur regardless of list size. Verified via
+     `elementFromPoint` in Chrome (Blink) that filters, any row's
+     select, any row's badge, and cross-row links are all genuinely
+     blocked. **Chrome iOS uses WebKit, not Blink** (Apple requires
+     this for every iOS browser) — the Blink confirmation doesn't
+     transfer. Simulator testing (Safari, WebKit) confirmed the same
+     row select and cross-row links blocked via real taps, but could
+     not cleanly test the filter pills specifically: at this viewport
+     height, the open popover's own box visually covers the filters for
+     the row tested, so a tap there lands on the popover (which
+     correctly no-ops) rather than proving anything about the filters
+     underneath. The mechanism is the same CSS rule for both, but this
+     is a real gap in what got verified, not a technicality — say so
+     plainly if asked, don't round it up to "confirmed."
 - [Linear theme] The page background could shift or repaint
   inconsistently while scrolling on iOS Safari/Chrome —
   `background-attachment: fixed` (used to keep the gradient consistent
@@ -94,10 +115,6 @@ project deploys straight from `main` with no version numbers, so
 - `TEST_CASES.md` — human-readable test cases for both the automated
   suite and the flows that need a live session/browser to exercise.
 - This changelog.
-- `app/components/PopoverLock.tsx` — a small context, instantiated once
-  per job row, giving that row's `CompatibilityBadge`/`LocationBadge`/
-  `StatusSelect` a shared "is either badge in this row open" flag to
-  drive the `pointer-events: none` lock described above.
 
 ## 2026-09-20
 

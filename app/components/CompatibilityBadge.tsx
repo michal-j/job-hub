@@ -104,8 +104,9 @@ export function CompatibilityBadge({
           position: "relative",
           display: "inline-block",
           zIndex: open ? 16 : "auto",
-          // The row's job-actions gets pointer-events:none while any
-          // badge in it is open (see JobList/PopoverLock) — this
+          // <body> gets a class making the rest of the page
+          // pointer-events:none while any popover is open (see
+          // usePopupDirection, globals.css `body.popover-open`) — this
           // specific trigger (and its own popover, nested inside it)
           // needs to opt back in, or it'd be unable to close/re-toggle
           // itself.

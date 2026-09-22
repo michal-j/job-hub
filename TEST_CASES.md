@@ -226,38 +226,47 @@ Use the browser's device toolbar (or resize the window) at roughly:
     popover, then click/tap the same score or location badge again →
     it closes (same effect as tapping outside).
 33. **Popover blocks interaction with the rest of the page while open.**
-    Two things to check, both confirmed on a real iOS Simulator
-    (iPhone 17 Pro, WebKit) as of 2026-09-22 — see `HANDOFF.md` for the
-    fix history and why Simulator testing (not just Chrome) is what
-    finally nailed this one down:
-    - **Cross-row**: open a popover, tap a *different* row's job link
-      or another row's badge → blocked, the tap just closes the
-      popover (`.popover-scrim`, a full-viewport element catching the
-      tap via z-index — `document.elementFromPoint(x, y)` at the
-      target's coordinates should return the scrim, not the target).
-      This part always worked, even before the fix below.
-    - **Same-row**: open a popover, tap *that row's own* status select
-      or its other badge → also blocked now (previously the real bug:
-      the scrim's z-index approach doesn't cover a row's own siblings
-      on WebKit specifically, a stacking quirk that never reproduced in
-      Chrome). Fixed via `pointer-events: none` applied to just that
-      row's `.job-actions` (a `PopoverLock` context scoped **per row**,
-      not to the whole list — check `getComputedStyle(el).pointerEvents`
-      is `"none"` on the row's select while open, `"auto"` again once
-      closed). A first attempt scoped this lock to the *entire list*
-      instead of one row — that closed the gap in every test here too,
-      but froze the real app on sign-in/sign-out against actual
-      Supabase data (almost certainly the re-render cost of one shared
-      lock touched by every badge across every row, all re-rendering on
-      every open/close) and was reverted. The per-row version has the
-      same UI effect with a tiny, bounded blast radius — 3 components
-      per toggle, however many jobs are in the list — so that failure
-      mode shouldn't recur, but this hasn't been tested against a real
-      large dataset or the authenticated app, only `/demo`'s 33 jobs.
+    **Status as of 2026-09-22: fourth fix attempt, not yet confirmed by
+    the reporter.** Do not report this fixed on the strength of local
+    testing alone — three previous attempts each tested as working
+    somewhere (Chrome, or an iOS Simulator, or both) and still came back
+    broken on the reporter's actual Chrome-iOS device. See `HANDOFF.md`
+    for the full history. What's true of the *current* attempt
+    (`body.popover-open` + `pointer-events: none` on `.main-container`,
+    see `usePopupDirection`/`globals.css`):
+    - Confirmed via `elementFromPoint`/`getComputedStyle` in Chrome
+      (Blink engine) that filter pills, any row's status select, any
+      row's other badge, and cross-row job links are all genuinely
+      unreachable while a popover is open, and reachable again once
+      it's closed.
+    - Confirmed via real taps on an iOS Simulator (Safari, WebKit — the
+      same engine Chrome iOS is required to use) that a row's own
+      status select and a cross-row job link are blocked the same way.
+    - **NOT cleanly confirmed on the Simulator for the filter pills
+      specifically** — at this viewport height, an open popover's own
+      box visually covers the filters for the row tested, so a tap
+      there lands on the popover itself (which correctly no-ops) rather
+      than proving anything about pointer-events on the filters
+      underneath. Same CSS rule covers both, so there's good reason to
+      expect it holds, but this is a real gap in what got directly
+      observed, not a technicality — don't round it up to "confirmed"
+      when reporting on this.
+    - Blink (Chrome desktop) and WebKit (Safari, and by Apple's
+      requirement, Chrome iOS too) are different engines; a Blink
+      confirmation doesn't transfer to WebKit, which is *why* the
+      Simulator check above matters and why Chrome-desktop-only
+      testing isn't enough for this specific bug.
     - Switching between a row's two badges (tapping the *other* AI
       badge while one is open, rather than the select) is intentionally
       not blocked — treated as a valid "switch" action, not something
       to prevent.
+
+    If this comes back broken a fourth time: stop guessing at the
+    mechanism. Get a way to actually observe the failure on Chrome iOS
+    itself — a screen recording from the reporter, or Chrome iOS's
+    remote debugging over USB via `chrome://inspect` on a desktop
+    Chrome (works the same way it does for Chrome Android) — before
+    trying a fifth blind patch.
 34. **[Linear theme] Background stays visually consistent while
     scrolling** — on Linear Dark (the only theme with a background
     gradient), scroll a long job list (the "All" filter, 33 jobs) up

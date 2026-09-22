@@ -127,32 +127,53 @@ issues:
   `position: fixed` pseudo-element (`.app-shell::before`) instead, which
   iOS handles correctly.
 - A popover's scrim (`.popover-scrim`, blocks the rest of the page via
-  z-index) turned out not to cover a row's own siblings (the status
-  select, the row's other badge) on WebKit specifically — a stacking
-  quirk local to that flex container. Fixed with a *second*,
-  independent mechanism: `pointer-events: none` applied to that row's
-  own `.job-actions` while either of its badges is open (`PopoverLock`
-  context, instantiated **once per row**, not once for the whole list —
-  a first attempt shared one lock across the entire job list and froze
-  the real app on sign-in/sign-out against actual Supabase data, almost
-  certainly from every badge in every row re-rendering on every
-  open/close; the per-row version has the same effect with a bounded,
-  3-components-per-toggle blast radius regardless of list size).
+  z-index) doesn't reliably block anything on Chrome iOS — not just a
+  row's own siblings (the original finding), but things nowhere near a
+  job row either, like the filter pills. **Currently addressed with
+  `pointer-events: none` on `.main-container` (filters + the whole job
+  list) while any popover anywhere is open** — a single `body.popover-
+  open` class toggled directly via `document.body.classList` in
+  `usePopupDirection` (see `globals.css`), deliberately NOT a React
+  Context: an earlier version scoped a `pointer-events` lock to a
+  React Context shared across the whole list froze the real app on
+  sign-in/sign-out against actual Supabase data (almost certainly every
+  badge in every row re-rendering on every open/close); a *narrower*,
+  per-row-scoped version of that same Context tested as fully working
+  on both Chrome desktop and an iOS Simulator, then came back from the
+  reporter as still broken on real Chrome iOS — filter pills still
+  tappable, which the per-row fix never even touched, meaning the
+  scrim's failure is broader than "one row's siblings." The body-class
+  version avoids React state entirely, so there's no re-render cost to
+  cause a repeat of the freeze regardless of list size — but as of this
+  writing it has NOT been confirmed fixed on the reporter's actual
+  device. If it comes back broken again: this makes four attempts at
+  the same bug, so stop guessing at the mechanism and get a way to
+  actually observe the failure on Chrome iOS itself before trying a
+  fifth (real device screen recording, remote debugging over USB via
+  `chrome://inspect` on a desktop Chrome — Chrome iOS supports this the
+  same way Chrome Android does — anything that shows the actual DOM/
+  computed styles at the moment of failure, not another blind patch).
 - Login inputs were 14px; iOS auto-zooms the page on focus for text
   inputs under 16px, and because signing in navigates away client-side
   (no full page reload), the zoom never got a chance to reset. Bumped
-  to 16px.
+  to 16px. Confirmed fixed.
 
 An Xcode + iOS Simulator became available in this environment partway
 through chasing these — **use it** (`mcp__Claude_Code_iOS_Simulator__control`)
 for anything that smells WebKit-specific rather than reasoning about it
-blind; two of the three bugs above were shipped wrong at least once
-specifically because there was no way to see the actual failure before
-that. Two gotchas learned the hard way: the control tool's tap
-coordinates are in device points, not the screenshot's pixel dimensions
-(divide screenshot pixel coordinates by the ratio reported on `attach` —
-~2.3x on the device tested here — there's no error if you get this
-wrong, taps just silently land somewhere else); and `localhost:3000` /
+blind. It's necessary but **not sufficient**: the Simulator runs Safari,
+and Chrome for iOS — despite being a different app, with its own UI and
+possibly its own event-handling quirks on top — is required by Apple to
+render through the same WebKit engine underneath, so Simulator testing
+is a reasonable proxy for "is this a WebKit rendering/stacking issue"
+but not a substitute for testing Chrome iOS itself when the report is
+specifically about Chrome iOS. Two gotchas learned the hard way with
+the Simulator: the control tool's tap coordinates are in device points,
+not the screenshot's pixel dimensions (divide screenshot pixel
+coordinates by the ratio reported on `attach` — ~2.3x on the device
+tested here — there's no error if you get this wrong, taps just
+silently land somewhere else, and it's easy to mistake a coordinate
+miss for a real bug or vice versa); and `localhost:3000` /
 `127.0.0.1:3000` are reachable directly from the Simulator's Safari,
 same as from the host Mac, so there's no need to deploy anywhere to
 test against it.

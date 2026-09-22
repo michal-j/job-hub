@@ -899,12 +899,33 @@ a {
    easily land on a job's link, another badge, or the status dropdown
    underneath. It has no click handler of its own: it's simply not
    inside the trigger, so usePopupDirection's existing outside-click
-   listener already closes the popover when this is what gets clicked. */
+   listener already closes the popover when this is what gets clicked.
+
+   This alone is NOT enough on every engine — real-device testing on
+   Chrome iOS found it doesn't reliably block anything (not even the
+   filter pills, nowhere near a job row), while it tested as fully
+   working on Chrome desktop and an iOS Simulator. `body.popover-open`
+   below is a second, independent mechanism (pointer-events, not
+   z-index/stacking) that doesn't share whatever cause that is. Kept
+   both rather than replacing this one, since this still demonstrably
+   works in some environments and removing it would be a pure loss
+   there for no proven gain elsewhere. */
 .popover-scrim {
   position: fixed;
   inset: 0;
   z-index: 15;
   background: transparent;
+}
+
+/* Set on <body> by usePopupDirection while any popover anywhere is
+   open. Blocks interaction with everything in the main content area —
+   job links, other rows, filters, the status dropdowns — none of which
+   should respond to a tap that's really meant to dismiss the popover.
+   The specific open trigger (and its own popover) opts back in via an
+   inline `pointer-events: auto` — see CompatibilityBadge/LocationBadge —
+   which always wins over this ancestor rule regardless of engine. */
+body.popover-open .main-container {
+  pointer-events: none;
 }
 
 .popover {
